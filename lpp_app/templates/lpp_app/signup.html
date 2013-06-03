@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block login %}    
+    <form action="{% url login %}" method="post">{% csrf_token %}        
+        {% for field in auth_form %}
+        {{ field }}
+        {% endfor %}                
+        <input type="submit" id="btnLogIn" value="Zaloguj">        
+    </form>    
+{% endblock %}
+
+{% block slider %}{% endblock %}
+
+{% block content %}
+<div class="registration">
+    <h1>Rejestracja nowego użytkownika</h1>
+    <form action="{% url signup %}" method="post">{% csrf_token %}
+        {% for field in user_form %}
+        {{ field }}  
+        <br>  
+        {% endfor %}
+        <input type="submit" value="Zarejestruj">
+    </form> 
+</div>
+{% endblock %}
+
+{% block news %}{% endblock %}
+{% block sidebar %}{% endblock %}

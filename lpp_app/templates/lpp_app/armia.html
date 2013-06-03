@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+
+{% block content %}
+
+<div class="profil">
+    <div class="panel top">
+        <h1>Osada: <span class="nazwa"><a href="{% url osada %}">{{ osada.nazwa }}</a></span> 
+            | Budżet: <span class="budzet">{{ osada.budzet }} &#36;</span>
+            | Rozwój: <span class="rozwoj">{{ osada.rozwoj }} %</span>
+            | Czas życia: <span class="czas">{{ osada.data_powstania|timesince }}</span>            
+        </h1>
+    </div>
+
+    <div class="panel left">
+        <a class="btn" href="{% url osada %}">Powrót</a>
+        <span style="margin: 10px; font-size: 18px;">
+            {% if kupiony_obiekt %}<span style="color:green">Kupiłeś: {{ kupiony_obiekt.nazwa }}</span>{% endif %}        
+            {% if brak_srodkow %}<span style="color:red">Brak srodków w budżecie</span>{% endif %}
+        </span>
+        <table class="table table-hover">            
+            <thead>
+                <tr>
+                <th>Typ wojownika</th>
+                <th>Ilość</th>                    
+                <th>Cena</th>
+                <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ar in armia %}
+                    <tr>                        
+                        <td class="span3"><a href="#">{{ ar.obiekt.nazwa }}</a></td>
+                        <td class="span2">{{ ar.ilosc }}</a></td>
+                        <td class="span2">{{ ar.obiekt.cena }} &#36;</a></td>                        
+                        <td class="span2"><a href="{{ ar.obiekt.get_absolute_url }}">Kup</a></td>
+                        <td></td>
+                    </tr>
+                {% endfor %}                
+            </tbody>
+        </table>           
+    </div>
+
+    <div class="panel right">
+    </div>
+</div>
+
+{% endblock %}
+
+{% block news %}{% endblock %}
+{% block sidebar %}{% endblock %}

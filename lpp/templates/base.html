@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Tazo Gaming</title>    
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}reset.css" type="text/css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}style.less" type="text/less" />
     <script src="{{ STATIC_URL }}less.js"></script>
@@ -14,20 +15,20 @@
 
         <header>            
             <div class="logo">
-                <a href="index.html" title="tazo gaming"><img src="{{ STATIC_URL }}img/logo.png" /></a>
+                <a href="{% url index %}" title="tazo gaming"><img src="{{ STATIC_URL }}img/logo.png" /></a>
             </div>
-            
-            {% block login %}
-            <nav class="primary">
+                        
+            <nav class="primary">                
                 <ul>
-                    {% comment %}<li>
-                        <form action="/logout">
-                            <input type="submit" id="btnLogOut" value="Log Out">
-                        </form>
-                    </li>{% endcomment %}
+                    {% block login %}
                     <li>
-                        <a href="#">Profil</a>
-                        <p>Twój profil</p>
+                        <form action="/logout">
+                            <input style="margin-top: 1px; margin-left: 10px;" type="submit" id="btnLogOut" value="Wyloguj">
+                        </form>
+                    </li>
+                    <li>
+                        <a href="{% url index %}">Profil</a>
+                        <p style="text-align:center; color: orange">({{ username }})</p>
                     </li>
                     <li>
                         <a href="#">Mecze</a>                        
@@ -36,17 +37,18 @@
                     <li>
                         <a href="#">Społeczność</a>
                         <p>Wymie informacje</p>                        
-                    </li>
+                    </li>                                    
+                    {% endblock %}
                     <li>
                         <a href="#">Blog</a>
                         <p>Co nowego?</p>
-                    </li>                    
-                </ul>
-            </nav>  
-            {% endblock %}          
+                    </li>
+                </ul>                
+            </nav>                      
 
         </header>
         
+        {% block slider %}
         <div id="slider">
             <div class="slider-header-box1">
                 <p><span class="red-text">Nowe pojedynki</span> z innymi graczami</p>                    
@@ -60,27 +62,31 @@
 
             <a href="#">[ więcej ]</a>
         </div>
+        {% endblock %}
 
+        {% block news %}
         <section id="news-content">
             <article class="news-post">                
                 <h1 class="news-post-header"><a href="#">This is a Lorem Ipsum Heading</a></h1>                                                                
                 <p>Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo. </p>
-                <a class="btn" href="#" title="czytaj wiêcej"></a>                
+                <a class="btn-read" href="#" title="czytaj wiêcej"></a>                
             </article>
 
             <article class="news-post">
                 <h1 class="news-post-header"><a href="#">This is a Lorem Ipsum Heading</a></h1>
                 <p>Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo. </p>
-                <a class="btn" href="#" title="czytaj wiêcej"></a>
+                <a class="btn-read" href="#" title="czytaj wiêcej"></a>
             </article>
 
             <article class="news-post">
                 <h1 class="news-post-header"><a href="#">This is a Lorem Ipsum Heading</a></h1>
                 <p>Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo. </p>
-                <a class="btn" href="#" title="czytaj wiêcej"></a>
+                <a class="btn-read" href="#" title="czytaj wiêcej"></a>
             </article>
         </section>
+        {% endblock %}
 
+        {% block content %}
         <div class="main-content">
             <section class="event-content">                  
                 <article>                                
@@ -91,7 +97,7 @@
                         Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo. 
                         Sed non  mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris in erat justo.                         
                     </p>                                        
-                    <a class="btn" href="#" title="czytaj wiêcej"></a>
+                    <a class="btn-read" href="#" title="czytaj wiêcej"></a>
                 </article>
             </section>
 
@@ -120,8 +126,10 @@
                     <p>This is Photoshop's version  of Lorem Ipsum. Proin gravida nibh vel velit auctor aliquet. Aenean</p>
                 </article>
             </section>
-        </div>        
+        </div>    
+        {% endblock %}    
         
+        {% block sidebar %}
         <aside>
             <div id="side-box">
                 <div class="box">
@@ -155,11 +163,13 @@
 
             </div>
         </aside>
+        {% endblock %}
 
+        {% block footer %}
         <footer>
             <small>Copyright &copy; 2013 <a href="#" title="tazo gaming">Tazo Gaming </a> by <span class="author">Tazo</span></small>
-        </footer>        
-        
+        </footer>  
+        {% endblock %}              
     </div>
 
 </body>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block login %}
+    <div class="register-btn">
+        <a href="{% url signup %}">Rejestracja</a>
+    </div>
+
+    <form action="{% url login %}" method="post">{% csrf_token %}        
+        {% for field in auth_form %}
+        {{ field }}
+        {% endfor %}            
+        <input type="submit" id="btnLogIn" value="Zaloguj">        
+    </form>    
+{% endblock %}

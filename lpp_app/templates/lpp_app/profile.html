@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+{% block news %}{% endblock %}
+
+{% block content %}
+<div class="profil">
+   <div class="panel top">
+        {% if osada %}
+        <h1>Osada: <span class="nazwa"><a href="{% url osada %}">{{ osada.nazwa }}</a></span> 
+            | Budżet: <span class="budzet">{{ osada.budzet }} &#36;</span>
+            | Rozwój: <span class="rozwoj">{{ osada.rozwoj }} %</span>
+            | Czas życia: <span class="czas">{{ osada.data_powstania|timesince }}</span>
+        </h1>
+        {% else %}
+        <h1>Osada: brak</h1>
+        {% endif %}
+    </div> 
+
+    <div class="panel left">                        
+        <div class="menu">
+            <ul>
+                {% if osada %}
+                    <li><a href="{% url osada %}">Zobacz osadę (<span style="color:orange">{{ osada.nazwa }}</span>)</li>               
+                {% else %}            
+                    <li><a href="{% url nowa_osada %}">Załóż osadę </a></li>
+                {% endif %}
+                <li><a href="#">Statystyki</a></li>
+                <li><a href="#">Edytuj profil</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+

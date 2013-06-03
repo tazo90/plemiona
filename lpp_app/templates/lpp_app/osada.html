@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+
+{% block content %}
+
+<div class="profil">
+    <div class="panel top">                
+        <h1>Osada: <span class="nazwa"><a href="{% url osada %}">{{ osada.nazwa }}</a></span> 
+            | Budżet: <span class="budzet">{{ osada.budzet }} &#36;</span>
+            | Rozwój: <span class="rozwoj">{{ osada.rozwoj }} %</span>
+            | Czas życia: <span class="czas">{{ osada.data_powstania|timesince }}</span>
+        </h1>        
+    </div>
+
+    <div class="panel left">
+        <table class="table table-hover" style="margin-left:20px; width:350px">            
+            <thead>
+                <tr>
+                <th>Nr.</th>
+                <th>Typ</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="span1">1.</td><td><a href="{% url obiekty 'armia' %}">Armia</a></td></tr>
+                <tr><td class="span1">2.</td><td><a href="{% url obiekty 'budynki' %}">Budynki</a></td></tr>
+                <tr><td class="span1">3.</td><td><a href="{% url obiekty 'mieszkancy' %}">Ludność</a></td></tr>
+                <tr><td class="span1">4.</td><td><a href="{% url obiekty 'zasoby' %}">Zasoby</a></td></tr>
+            </tbody>
+        </table>        
+    </div>
+
+    <div class="panel right">
+    </div>
+</div>
+{% comment %}{% for ar in armia %}
+    {{ ar.obiekt.nazwa }}: {{ bud.ilsoc }}<br />
+{% endfor %}
+---------------------------- 
+<br>
+{% for bud in budynki %}
+    {{ bud.obiekt.nazwa }}: {{ bud.ilosc }}<br />
+{% endfor %}
+----------------------------   
+<br> 
+{% for miesz in mieszkancy %}
+    {{ miesz.obiekt.nazwa }}: {{ miesz.ilosc }}<br />
+{% endfor %}
+----------------------------   
+<br> 
+{% for zas in zasoby %}
+    {{ zas.obiekt.nazwa }}: {{ zas.ilosc }}<br />
+{% endfor %}
+----------------------------   
+{% endcomment %}
+
+{% endblock %}
+
+{% block news %}{% endblock %}
+{% block sidebar %}{% endblock %}

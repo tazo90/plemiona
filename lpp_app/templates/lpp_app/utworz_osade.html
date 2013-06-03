@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+
+{% block content %}
+
+<form action="{% url nowa_osada %}" method="post">{% csrf_token %}
+    {{ osada_form.as_table }}
+    <br>
+    <input type="submit" value="Utwórz">
+</form>
+
+{% endblock %}
+
+{% block news %}{% endblock %}
+{% block sidebar %}{% endblock %}
