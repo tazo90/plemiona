@@ -40,5 +40,5 @@ class AuthenticateForm(AuthenticationForm):
 class OsadaForm(forms.ModelForm):
     class Meta:
         model = Osada        
-        exclude = ('user', 'budzet', 'rozwoj', )
+        fields = ('nazwa', )
 

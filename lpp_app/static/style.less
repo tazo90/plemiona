@@ -578,10 +578,58 @@ div.profil {
 
         &.top
         {
-            height: 50px;
+            height: 40px;
             background: #682A1B;
             width: @content-width - 40;
-            margin: 0 auto 10px auto;            
+            margin: 0 auto 10px auto; 
+
+            p {                  
+                margin: -2px 0;
+                font-weight: normal;
+                font-size: 15px;
+                color: white;
+                padding: 13px 23px;
+                height: 23px;                                
+
+                a, span.nazwa {
+                    color: red;
+                    font-size: 14px;
+                }
+
+                span.czas {
+                    color: #000;
+                    font-size: 14px;
+                }
+
+                span {                    
+                    font-weight: bold;
+                    font-size: 14px;
+                    
+                    &.zloto {
+                        color: #F6ED6B;             
+                    }
+
+                    &.drewno {
+                        color: #BA7733;
+                    }
+
+                    &.czas {
+                        color: #000;
+                    }
+
+                    &.kamien {
+                        color: #6C655F;
+                    }
+
+                    &.zelazo {
+                        color: #685883;
+                    }
+
+                    &.rozwoj {
+                        color: #43945B;
+                    }
+                }                   
+            }
         }
 
         &.right {
@@ -602,38 +650,7 @@ div.profil {
 
         form {
             margin: 0 23px;                
-        }
-
-        h1 {        
-            margin: 5px 0;
-            font-weight: normal;
-            font-size: 18px;
-            color: white;
-            padding: 13px 23px;
-            height: 23px;
-
-            a, span.nazwa {
-                color: red;
-                font-size: 18px;
-            }
-
-            span.czas {
-                color: #000;
-                font-size: 18px;
-            }
-
-            span.budzet {
-                font-weight: bold;
-                font-size: 18px;
-                color: green;
-            }
-
-            span.rozwoj {
-                font-weight: bold;
-                font-size: 18px;
-                color: #E1E638;
-            }
-        }
+        }        
 
         p {
             padding: 0 24px;

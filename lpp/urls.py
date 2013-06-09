@@ -14,5 +14,13 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     #url(r'^admin/', include(admin.site.urls)),
+    url(r'^$', 'lpp_app.views.index', name='index'),
+    url(r'login$', 'lpp_app.views.login_view', name='login'),
+    url(r'logout$', 'lpp_app.views.logout_view', name='logout'),        
+    url(r'signup$', 'lpp_app.views.signup', name='signup'),
+    url(r'spolecznosc$', 'lpp_app.views.spolecznosc', name='spolecznosc'),
+    url(r'market$', 'lpp_app.views.market', name='market'),
+    url(r'pojedynki$', 'lpp_app.views.pojedynki', name='pojedynki'),
+
     url(r'', include('lpp_app.urls')),
 )

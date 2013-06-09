@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+{% block news %}{% endblock %}
+
+{% block content %}
+<div class="profil">
+   <div class="panel top">        
+        {% load status_bar %}
+        {% show_status_bar %}
+    </div> 
+
+    <div class="panel left">                        
+        <div class="menu">
+            <ul>                
+                {% if osada %}
+                    <li><a href="{% url osada request.user.profile %}">Zobacz osadę (<span style="color:orange">{{ osada.nazwa }}</span>)</li>               
+                {% else %}            
+                    <li><a href="{% url nowa_osada request.user.profile %}">Załóż osadę </a></li>
+                {% endif %}
+                <li><a href="{% url zaproszenia user.profile %}">Zaproszenia</a></li>
+                <li><a href="{% url friends user.profile %}">Zaprzyjaznione osady</a></li>
+                <li><a href="{% url market %}">Market</a></li>
+                <li><a href="{% url statystyki user.profile %}">Statystyki</a></li>
+                <li><a href="{% url edycja_profilu user.profile %}">Edytuj profil</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+

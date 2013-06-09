@@ -9,12 +9,37 @@ Creates the default Objects, after created tables (syncdb)
 from django.db.models import signals
 from django.db import connections
 from django.db import router
-from .models import Obiekt, Kategoria as Kat
+from .models import Obiekt, Kategoria as Kat, Armia, Budynki
 import models as site_app
 from django.core.management.color import no_style
 
 def create_default_navigation(app, created_models, verbosity, db, **kwargs):
+    if Armia in created_models and router.allow_syncdb(db, Armia) and \
+    Budynki in created_models and router.allow_syncdb(db, Budynki):
+        if verbosity >= 2:
+            print("Creating obiects")        
+
+        Budynki(pk=1, nazwa="Kopalnia zelaza", koszt=500, zloto=0, drewno=30, kamien=100, zelazo=5, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=2, nazwa="Kopalnia zlota", koszt=1000, zloto=0, drewno=50, kamien=150, zelazo=10, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=3, nazwa="Farma", koszt=150, zloto=0, drewno=40, kamien=50, zelazo=5, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=4, nazwa="Kopalnia zelaza", koszt=500, zloto=0, drewno=30, kamien=100, zelazo=5, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
+
+        Armia(pk=1, nazwa="Ryczerz zloty", koszt=300, atak=100, obrona=100, zbroja=100, zloto=5, drewno=0, kamien=0, zelazo=4).save()
+        Armia(pk=2, nazwa="Ryczerz srebrny", koszt=180, atak=70, obrona=50, zbroja=65, zloto=0, drewno=0, kamien=0, zelazo=8).save()
+        Armia(pk=3, nazwa="Ryczerz brazowy", koszt=100, atak=30, obrona=20, zbroja=30, zloto=0, drewno=0, kamien=0, zelazo=3).save()
+        
+
+        sequence_sql = connections[db].ops.sequence_reset_sql(no_style(), [Armia, Budynki])        
+        if sequence_sql:
+            if verbosity >= 2:
+                print("Resetting sequence")
+            cursor = connections[db].cursor()
+            for command in sequence_sql:
+                cursor.execute(command)       
+    
+
     # Only create the default navigation in databases where Django created the table
+    """
     if Kat in created_models and router.allow_syncdb(db, Kat) and \
         Obiekt in created_models and router.allow_syncdb(db, Obiekt):
         if verbosity >= 2:
@@ -76,6 +101,7 @@ def create_default_navigation(app, created_models, verbosity, db, **kwargs):
             cursor = connections[db].cursor()
             for command in sequence_sql:
                 cursor.execute(command)
+    """
 
     #Nav.objects.clear_cache()
 

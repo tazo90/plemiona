@@ -10,7 +10,7 @@
 
 {% block content %}
 
-<form action="{% url nowa_osada %}" method="post">{% csrf_token %}
+<form action="{% url nowa_osada request.user.profile %}" method="post">{% csrf_token %}
     {{ osada_form.as_table }}
     <br>
     <input type="submit" value="Utwórz">

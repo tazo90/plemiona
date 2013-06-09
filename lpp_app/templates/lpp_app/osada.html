@@ -12,14 +12,12 @@
 
 <div class="profil">
     <div class="panel top">                
-        <h1>Osada: <span class="nazwa"><a href="{% url osada %}">{{ osada.nazwa }}</a></span> 
-            | Budżet: <span class="budzet">{{ osada.budzet }} &#36;</span>
-            | Rozwój: <span class="rozwoj">{{ osada.rozwoj }} %</span>
-            | Czas życia: <span class="czas">{{ osada.data_powstania|timesince }}</span>
-        </h1>        
+        {% load status_bar %}
+        {% show_status_bar %}
     </div>
 
     <div class="panel left">
+        <a class="btn" href="{% url profil request.user.profile %}">Powrót</a>
         <table class="table table-hover" style="margin-left:20px; width:350px">            
             <thead>
                 <tr>
@@ -28,10 +26,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr><td class="span1">1.</td><td><a href="{% url obiekty 'armia' %}">Armia</a></td></tr>
-                <tr><td class="span1">2.</td><td><a href="{% url obiekty 'budynki' %}">Budynki</a></td></tr>
-                <tr><td class="span1">3.</td><td><a href="{% url obiekty 'mieszkancy' %}">Ludność</a></td></tr>
-                <tr><td class="span1">4.</td><td><a href="{% url obiekty 'zasoby' %}">Zasoby</a></td></tr>
+                <tr><td class="span1">1.</td><td><a href="{% url obiekty user.profile 'armia' %}">Armia</a></td></tr>
+                <tr><td class="span1">2.</td><td><a href="{% url obiekty user.profile 'budynki' %}">Budynki</a></td></tr>
+                <tr><td class="span1">3.</td><td><a href="{% url obiekty user.profile 'mieszkancy' %}">Ludność</a></td></tr>
+                <tr><td class="span1">4.</td><td><a href="{% url obiekty user.profile 'zasoby' %}">Zasoby</a></td></tr>
             </tbody>
         </table>        
     </div>
@@ -39,26 +37,6 @@
     <div class="panel right">
     </div>
 </div>
-{% comment %}{% for ar in armia %}
-    {{ ar.obiekt.nazwa }}: {{ bud.ilsoc }}<br />
-{% endfor %}
----------------------------- 
-<br>
-{% for bud in budynki %}
-    {{ bud.obiekt.nazwa }}: {{ bud.ilosc }}<br />
-{% endfor %}
-----------------------------   
-<br> 
-{% for miesz in mieszkancy %}
-    {{ miesz.obiekt.nazwa }}: {{ miesz.ilosc }}<br />
-{% endfor %}
-----------------------------   
-<br> 
-{% for zas in zasoby %}
-    {{ zas.obiekt.nazwa }}: {{ zas.ilosc }}<br />
-{% endfor %}
-----------------------------   
-{% endcomment %}
 
 {% endblock %}
 

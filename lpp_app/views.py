@@ -3,22 +3,32 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from .forms import AuthenticateForm, UserCreateForm, OsadaForm
 from django.core.urlresolvers import reverse
-from .models import Osada, OsadaObiekt, Obiekt
+from .models import Osada, OsadaObiekt, Obiekt, Invites, Friends
 from django.db.models import F
+from django.contrib.auth.decorators import login_required
 
 def index(request, auth_form=None, user_form=None):
     # User is logged
+    
     if request.user.is_authenticated():        
         user = request.user        
 
         osada = Osada.objects.filter(user=request.user.profile)
         if osada:
             osada = osada[0]    
+
         
-        return render(request, 
-                      "lpp_app/profile.html",
+        """return render(request, 
+                      "lpp_app/profil.html",
                       {'user': user, 'next_url': '/', 'osada': osada, })    
-    else:
+        """
+        return render(request, 
+                      "lpp_app/home.html",
+                      {'user': user, 'next_url': '/', 'osada': osada, })    
+        
+        #return profil(request)
+
+    else:    
         # User is not logged in
         auth_form = auth_form or AuthenticateForm()
         user_form = user_form or UserCreateForm()
@@ -28,13 +38,23 @@ def index(request, auth_form=None, user_form=None):
                      {'auth_form': auth_form, })
 
 
+def profil(request, nazwa_profilu=None):
+    user = request.user
+    osada = Osada.objects.filter(user=user.profile)    
+    if osada:
+        osada = osada[0]    
+
+    return render(request,
+                  "lpp_app/profil.html",
+                  {'user': user, 'osada': osada, })
+
 def login_view(request):
     if request.method == 'POST':        
         form = AuthenticateForm(data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
-            # Success
-            return redirect('/')
+            # Success, route to user profile
+            return redirect(reverse('profil', args=(request.user.profile,) ))
         else:
             # Failure
             # route to specified url depending on url passed in POST
@@ -60,7 +80,7 @@ def signup(request, auth_form=None, user_form=None):
             user_form.save()
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('/')
+            return redirect(reverse('profil', args=(request.user.profile,)))
         else:
             return signup(request, user_form=user_form)
 
@@ -71,7 +91,14 @@ def signup(request, auth_form=None, user_form=None):
                   {'user_form': user_form, 'auth_form': auth_form, })    
 
 
-def nowa_osada(request, osada_form=None):    
+@login_required
+def edycja_profilu(request, nazwa_profilu=None):
+  return render(request,
+                "lpp_app/edycja_profilu.html")
+
+
+@login_required
+def nowa_osada(request, nazwa_profilu=None, osada_form=None):    
     if request.method == "POST":         
         osada_form = OsadaForm(data=request.POST)
         if osada_form.is_valid():
@@ -87,8 +114,8 @@ def nowa_osada(request, osada_form=None):
                  "lpp_app/utworz_osade.html", 
                  {'osada_form': osada_form, })        
 
-
-def osada(request):
+@login_required
+def osada(request, nazwa_profilu=None):
     osada = Osada.objects.filter(user=request.user.profile)[0]
 
     # pobierz obiekty
@@ -119,7 +146,8 @@ def osada(request):
                  })
 
 
-def obiekty(request, kategoria='', kupiony_obiekt=None, brak_srodkow=False):
+@login_required
+def obiekty(request, nazwa_profilu=None, kategoria=None, kupiony_obiekt=None, brak_srodkow=False):
     osada = Osada.objects.filter(user=request.user.profile)[0]
     obiekty = OsadaObiekt.objects.select_related().filter(osada=osada).order_by('-obiekt__cena')        
 
@@ -160,8 +188,8 @@ def obiekty(request, kategoria='', kupiony_obiekt=None, brak_srodkow=False):
         return redirect(reverse('osada'))
 
 
-
-def kup(request, kategoria, slug, id):
+@login_required
+def kup(request, nazwa_profilu=None, kategoria=None, slug=None, id=None):
     osada = Osada.objects.get(user=request.user)
     kupiony_obiekt = Obiekt.objects.get(pk=id)        
     brak_srodkow = False
@@ -190,3 +218,39 @@ def kup(request, kategoria, slug, id):
 
     # po kupnie pozostan na tej samej stronie (kategorii)   
     return obiekty(request, kategoria, kupiony_obiekt, brak_srodkow)
+
+
+@login_required
+def spolecznosc(request):
+    osady = Osada.objects.all()
+    return render(request, 
+                  "lpp_app/spolecznosc.html",
+                  {'osady': osady,})
+
+@login_required
+def zaproszenia(request, nazwa_profilu=None):
+    invites = Invites.objects.filter(user_from__user=request.user.profile)
+    return render(request,
+                  "lpp_app/zaproszenia.html",
+                  {'invites': invites, })
+
+@login_required
+def friends(request, nazwa_profilu=None):
+    #friends = Friends.objects.filter(user_from__user=request.user.profile)
+    return render(request,
+                  "lpp_app/friends.html")
+
+@login_required
+def market(request):
+    return render(request,
+                  "lpp_app/market.html")
+
+@login_required
+def pojedynki(request):
+  return render(request,
+                "lpp_app/pojedynki.html")
+
+@login_required
+def statystyki(request, nazwa_profilu=None):
+  return render(request,
+               "lpp_app/statystyki.html")

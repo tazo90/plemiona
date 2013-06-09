@@ -1,6 +1,7 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch.dispatcher import receiver
 from .models import Osada, Kategoria, Obiekt, OsadaObiekt
+from .models import Armia, Armia_osada, Budynki, Budynki_osada
 
 """
 @receiver(pre_save, sender=Osada, dispatch_uid="osada_pre_save")
@@ -25,7 +26,22 @@ def update_product_count_on_save(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Osada, dispatch_uid="osada_post_save")
 def update_objects_osada_on_save(sender, instance, **kwargs):
-    """ Update product count in category if product was deleted """
+    # When created osada then create Armia and Budynki connected with created Osada
+    new_osada = Osada.objects.get(pk=instance.id)
+
+    armia = Armia.objects.all()
+    budynki = Budynki.objects.all()
+
+    for ar in armia:
+        Armia_osada.objects.create(osada=new_osada, armia=ar, zloto=ar.zloto, drewno=ar.drewno, kamien=ar.kamien, zelazo=ar.zelazo)
+
+    for bud in budynki:
+        Budynki_osada.objects.create(osada=new_osada, budynek=bud, zloto=bud.zloto, drewno=bud.drewno, kamien=bud.kamien, zelazo=bud.zelazo)
+
+
+"""@receiver(post_save, sender=Osada, dispatch_uid="osada_post_save")
+def update_objects_osada_on_save(sender, instance, **kwargs):
+    # Update product count in category if product was deleted 
     
     new_osada = Osada.objects.get(pk=instance.id)
     obiekty = Obiekt.objects.all()
@@ -35,7 +51,7 @@ def update_objects_osada_on_save(sender, instance, **kwargs):
 
     #instance.category.product_count -= 1
     #instance.category.save()
-
+"""
 
 from django.contrib.auth.signals import user_logged_in
 

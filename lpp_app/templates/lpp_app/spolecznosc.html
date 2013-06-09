@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+{% block news %}{% endblock %}
+
+{% block content %}
+<div class="profil">
+   <div class="panel top">
+        {% load status_bar %}
+        {% show_status_bar %}
+    </div> 
+
+    <div class="panel left">                        
+        <div class="menu">
+            <table class="table table-hover">            
+            <thead>
+                <tr>
+                <th>Nr.</th>
+                <th>Nazwa osady</th>
+                <th>Nazwa wodza</th>                                                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for osada in osady %}
+                    <tr>     
+                        <td>{{ forloop.counter }}</td>
+                        <td class="span3"><a href="{{ osada.get_absolute_url }}">{{ osada.nazwa }}</a></td>
+                        <td class="span2">{{ osada.user }}</td>                                                
+                    </tr>
+                {% endfor %}                
+            </tbody>
+        </table>       
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+

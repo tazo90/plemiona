@@ -27,15 +27,15 @@
                         </form>
                     </li>
                     <li>
-                        <a href="{% url index %}">Profil</a>
+                        <a href="{% url profil request.user.profile %}">Profil</a>
                         <p style="text-align:center; color: orange">({{ username }})</p>
                     </li>
                     <li>
-                        <a href="#">Mecze</a>                        
-                        <p>Terminarz</p>
-                    </li>
+                        <a href="{% url pojedynki %}">Pojedynki</a>                        
+                        <p>Wybierz osadę</p>
+                    </li>                    
                     <li>
-                        <a href="#">Społeczność</a>
+                        <a href="{% url spolecznosc %}">Społeczność</a>
                         <p>Wymie informacje</p>                        
                     </li>                                    
                     {% endblock %}

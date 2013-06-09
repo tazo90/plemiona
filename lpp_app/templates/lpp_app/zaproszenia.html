@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+{% block news %}{% endblock %}
+
+{% block content %}
+<div class="profil">
+   <div class="panel top">
+        {% load status_bar %}
+        {% show_status_bar %}
+    </div> 
+
+    <div class="panel left">                        
+        <div class="menu">
+            <h1>Zaproszenia</h1>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+

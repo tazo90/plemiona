@@ -1,0 +1,13 @@
+{% if osada %}
+    <p>
+        Osada: <span class="nazwa"><a href="{{ osada.get_absolute_url }}">{{ osada.nazwa }}</a></span> 
+        | Złoto: <span class="zloto">{{ osada.zloto }} sztabek</span>
+        | Drewno: <span class="drewno">{{ osada.drewno }} desek</span>
+        | Kamień: <span class="kamien">{{ osada.kamien }} bloków</span>
+        | Żelazo: <span class="zelazo">{{ osada.zelazo }} rud</span>
+        | Rozwój: <span class="rozwoj">{{ osada.rozwoj }} %</span>
+        | Czas życia: <span class="czas">{{ osada.data_powstania|timesince }}</span>
+    </p>    
+{% else %}
+    <h1>Osada: brak</h1>
+{% endif %}
