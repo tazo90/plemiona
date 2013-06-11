@@ -227,13 +227,19 @@ def spolecznosc(request, nazwa_profilu=None):
 @login_required
 def zaproszenia(request, nazwa_profilu=None):
     sent_invites = Invites.objects.filter(user_from__user=request.user)
-    osady  = [Osada.objects.get(user=inv.user_to) for inv in sent_invites]
+    receive_invites = Invites.objects.filter(user_to__user=request.user)
     
-    sent_invites = zip(sent_invites, osady)
+    osady1 = [Osada.objects.get(user=inv.user_to) for inv in sent_invites]
+    osady2 = [Osada.objects.get(user=inv.user_from) for inv in receive_invites] 
+    
+    sent_invites = zip(sent_invites, osady1)
+    receive_invites = zip(receive_invites, osady2)
 
     return render(request,
                   "lpp_app/zaproszenia.html",
-                  {'sent_invites': sent_invites, })
+                  {'sent_invites': sent_invites, 
+                   'receive_invites': receive_invites,
+                  })
 
 @login_required
 def invite(request, nazwa_profilu=None, zapr_osoba=None):
@@ -241,9 +247,7 @@ def invite(request, nazwa_profilu=None, zapr_osoba=None):
   u2 = UserProfile.objects.get(user__username=zapr_osoba)    
   
   if not Invites.objects.filter(user_from=u1, user_to=u2):
-    Invites.objects.create(user_from=u1, user_to=u2)    
-
-  #  Invites.objects..create(user_from=)
+    Invites.objects.create(user_from=u1, user_to=u2)      
 
   return redirect(reverse("zaproszenia", args=(nazwa_profilu,)))
 
