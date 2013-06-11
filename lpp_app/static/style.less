@@ -642,6 +642,18 @@ div.profil {
                 height: 160px;
                 border: 1px solid @border-color;
             }
+
+            p {
+                font-size: 20px;
+                color: #A2CD5A;   
+                margin: 10px 0;
+                padding-bottom: 5px;
+                border-bottom: 1px dotted #A2CD5A;
+            }
+        }
+
+        &.right-short {
+            width: @main-content-width - 470;
         }
 
         * {
@@ -655,12 +667,21 @@ div.profil {
         p {
             padding: 0 24px;
             margin: 18px 0;
-        }
+        }        
 
         &.left {
             width: @main-content-width - 127;
             float: left;
             margin-left: 20px;
+            
+            p {
+                font-size: 20px;
+                color: #A2CD5A;   
+                margin: 10px 0;
+                padding-bottom: 5px;
+                border-bottom: 1px dotted #A2CD5A;
+            }
+
 
 
             div.ribbitWrapper {
@@ -703,27 +724,84 @@ div.profil {
                     }
                 } 
             }
+        }
+
+        &.left-wide {
+            width: @main-content-width + 80;
         }        
     }
 }
 
-div.menu {
-   ul {
-    padding: 40px;
-    
-    li {
-        padding: 5px;
-        border-bottom: 1px dotted orange;
-        width: 50%;
+div.menu {   
 
-        a {
-            font-size: 18px;
-            &:focus {
-                color: #ccc;
-            }
-        }
+    &.spolecznosc {
+        font-size: 16px;
     }
+
+    ul {
+        padding: 20px;
+    
+        li {
+            padding: 5px;
+            border-bottom: 1px dotted orange;
+            width: 50%;
+
+            a {
+                font-size: 18px;
+                &:focus {
+                    color: #ccc;
+                }
+            }
+        }    
    } 
+}
+
+div.wizytowka {        
+
+    h1 {
+        padding: 7px 0 0 150px;
+        font-size: 18px;
+        color: green;        
+
+        span.header {
+           color: #fff;
+        }
+    }    
+
+    ul {
+        padding: 0 20px;        
+    
+        li {
+            color: #fff;
+            padding: 5px;
+            border-bottom: 1px dotted orange;
+            width: 100%;
+
+            &.bez-borderu {
+                border-bottom: none;
+            }
+
+            &.alert-bar {
+                margin-top: -15px;
+            }
+
+            &.buttons {                
+                margin-top: -20px;
+                padding-bottom: 50px;
+
+                a {
+                    margin-left: 10px;
+                }                
+            }
+
+            a {
+                font-size: 15px;
+                &:focus {
+                    color: #ccc;
+                }
+            }
+        }   
+    } 
 }
 
 .btn {

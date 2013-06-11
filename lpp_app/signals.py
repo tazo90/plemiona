@@ -36,7 +36,7 @@ def update_objects_osada_on_save(sender, instance, **kwargs):
         Armia_osada.objects.create(osada=new_osada, armia=ar, zloto=ar.zloto, drewno=ar.drewno, kamien=ar.kamien, zelazo=ar.zelazo)
 
     for bud in budynki:
-        Budynki_osada.objects.create(osada=new_osada, budynek=bud, zloto=bud.zloto, drewno=bud.drewno, kamien=bud.kamien, zelazo=bud.zelazo)
+        Budynki_osada.objects.create(osada=new_osada, budynek=bud, zloto=bud.zloto, drewno=bud.drewno, kamien=bud.kamien, zelazo=bud.zelazo, produktywnosc=bud.produktywnosc, max_pojemnosc=bud.max_pojemnosc)
 
 
 """@receiver(post_save, sender=Osada, dispatch_uid="osada_post_save")

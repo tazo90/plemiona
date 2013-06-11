@@ -16,9 +16,29 @@
     </div> 
 
     <div class="panel left">                        
-        <div class="menu">
-            <h1>Zaproszenia</h1>
-        </div>
+        <p class="text-center">Wysłane zaproszenia</p> 
+        <table class="table table-hover" style="margin-left:20px; width:350px">
+            <thead>
+                <tr>
+                    <th>Nr.</th>
+                    <th>Nazwa osady</th>
+                    <th>Nazwa wodza</th>                    
+                    <th></th>
+            </thead>
+            <tbody>
+                {% for invite in sent_invites %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="span3"><a href="{% url wizytowka invite.1 %}">{{ invite.1 }}</a></td>
+                    <td class="span3">{{ invite.0.user_to }}</td>                    
+                </tr>                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel right">
+        <p class="text-center">Otrzymane zaproszenia</p> 
     </div>
 </div>
 {% endblock %}

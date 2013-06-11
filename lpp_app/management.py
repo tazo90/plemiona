@@ -19,14 +19,14 @@ def create_default_navigation(app, created_models, verbosity, db, **kwargs):
         if verbosity >= 2:
             print("Creating obiects")        
 
-        Budynki(pk=1, nazwa="Kopalnia zelaza", koszt=500, zloto=0, drewno=30, kamien=100, zelazo=5, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
-        Budynki(pk=2, nazwa="Kopalnia zlota", koszt=1000, zloto=0, drewno=50, kamien=150, zelazo=10, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
-        Budynki(pk=3, nazwa="Farma", koszt=150, zloto=0, drewno=40, kamien=50, zelazo=5, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
-        Budynki(pk=4, nazwa="Kopalnia zelaza", koszt=500, zloto=0, drewno=30, kamien=100, zelazo=5, produktywnosc=5, max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=1, nazwa="Kopalnia zelaza", koszt=500, zloto=0, drewno=30, kamien=100, zelazo=5, produktywnosc=5, jednostka_prod='rud', max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=2, nazwa="Kopalnia zlota", koszt=1000, zloto=0, drewno=50, kamien=150, zelazo=10, produktywnosc=5, jednostka_prod='sztabek', max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=3, nazwa="Farma", koszt=150, zloto=0, drewno=40, kamien=50, zelazo=5, produktywnosc=5, jednostka_prod='swin', max_pojemnosc=1000, max_poziom=2).save()
+        Budynki(pk=4, nazwa="Kopalnia kamienia", koszt=100, zloto=0, drewno=30, kamien=80, zelazo=5, produktywnosc=12, jednostka_prod='bloków', max_pojemnosc=1000, max_poziom=2).save()
 
-        Armia(pk=1, nazwa="Ryczerz zloty", koszt=300, atak=100, obrona=100, zbroja=100, zloto=5, drewno=0, kamien=0, zelazo=4).save()
-        Armia(pk=2, nazwa="Ryczerz srebrny", koszt=180, atak=70, obrona=50, zbroja=65, zloto=0, drewno=0, kamien=0, zelazo=8).save()
-        Armia(pk=3, nazwa="Ryczerz brazowy", koszt=100, atak=30, obrona=20, zbroja=30, zloto=0, drewno=0, kamien=0, zelazo=3).save()
+        Armia(pk=1, nazwa="Rycerz zloty", koszt=300, atak=100, obrona=100, zbroja=100, zloto=5, drewno=0, kamien=0, zelazo=4).save()
+        Armia(pk=2, nazwa="Rycerz srebrny", koszt=180, atak=70, obrona=50, zbroja=65, zloto=0, drewno=0, kamien=0, zelazo=8).save()
+        Armia(pk=3, nazwa="Rycerz brazowy", koszt=100, atak=30, obrona=20, zbroja=30, zloto=0, drewno=0, kamien=0, zelazo=3).save()
         
 
         sequence_sql = connections[db].ops.sequence_reset_sql(no_style(), [Armia, Budynki])        
@@ -90,20 +90,7 @@ def create_default_navigation(app, created_models, verbosity, db, **kwargs):
         Obiekt(pk=22, nazwa='drewno', kategoria=kat4, cena=10, poczatkowa_ilosc=5, max_ilosc=100000).save(using=db)        
         Obiekt(pk=23, nazwa='mąka', kategoria=kat4, cena=3, max_ilosc=100000).save(using=db)        
         Obiekt(pk=24, nazwa='mięso', kategoria=kat4, cena=8, poczatkowa_ilosc=5, max_ilosc=100000).save(using=db)        
-
-
-
-        # for Nav
-        sequence_sql = connections[db].ops.sequence_reset_sql(no_style(), [Kat])        
-        if sequence_sql:
-            if verbosity >= 2:
-                print("Resetting sequence")
-            cursor = connections[db].cursor()
-            for command in sequence_sql:
-                cursor.execute(command)
     """
-
-    #Nav.objects.clear_cache()
 
 signals.post_syncdb.connect(create_default_navigation, sender=site_app)
 

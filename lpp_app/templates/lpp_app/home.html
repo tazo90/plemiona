@@ -1,24 +1,8 @@
 {% extends "base.html" %}
 
-{% comment %}
-{% if not user.is_authenticated %}    
-    {% block login %}    
-        <div class="register-btn">
-            <a href="{% url signup %}">Rejestracja</a>
-        </div>
-
-        <form action="{% url login %}" method="post">{% csrf_token %}        
-            {% for field in auth_form %}
-            {{ field }}
-            {% endfor %}            
-            <input type="submit" id="btnLogIn" value="Zaloguj">        
-        </form>    
-    {% endblock %}
-{% else %}
-{% endcomment %}
 {% block login %}
 
-    {% if user.is_authenticated %}    {# dziedzicz blok login z rodzica #}
+    {% if user.is_authenticated %}    {# dziedzicz blok login z rodzica #}        
         {% with user.username as username %}
             {{ block.super }}
         {% endwith %}    

@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from .forms import AuthenticateForm, UserCreateForm, OsadaForm
 from django.core.urlresolvers import reverse
-from .models import Osada, OsadaObiekt, Obiekt, Invites, Friends
+from .models import Osada, OsadaObiekt, Obiekt, UserProfile, Invites, Friends, Armia, Armia_osada, Budynki, Budynki_osada
 from django.db.models import F
 from django.contrib.auth.decorators import login_required
 
@@ -114,59 +114,53 @@ def nowa_osada(request, nazwa_profilu=None, osada_form=None):
                  "lpp_app/utworz_osade.html", 
                  {'osada_form': osada_form, })        
 
+
+from django.views.decorators.csrf import csrf_exempt
 @login_required
-def osada(request, nazwa_profilu=None):
+@csrf_exempt
+def osada(request, nazwa_profilu=None):            
     osada = Osada.objects.filter(user=request.user.profile)[0]
 
-    # pobierz obiekty
-    armia = []    
-    budynki = []
-    mieszkancy = []
-    zasoby = []
+    armia = Armia_osada.objects.select_related().filter(osada=osada, ilosc__gt=0).order_by('-armia__nazwa')
+    budynki = Budynki_osada.objects.select_related().filter(osada=osada, ilosc__gt=0).order_by('-budynek__nazwa')
 
-    obiekty = OsadaObiekt.objects.select_related().filter(osada=osada)
-
-    for ob in obiekty:
-        if ob.obiekt.kategoria.nazwa == 'Armia':
-            armia.append(ob)
-        elif ob.obiekt.kategoria.nazwa == 'Budynki':
-            budynki.append(ob)
-        elif ob.obiekt.kategoria.nazwa == 'Mieszkancy':
-            mieszkancy.append(ob)
-        else:
-            zasoby.append(ob)
+    if request.POST.has_key('counter'):            
+      budynki.filter(budynek__nazwa=request.POST['obiekt_nazwa']).update(
+        produkcja=int(request.POST['counter'].split(' ')[0]) 
+        )      
 
     return render(request,
-                 "lpp_app/osada.html",
-                 {'osada': osada, 
-                  'armia': armia,
-                  'budynki': budynki,
-                  'mieszkancy': mieszkancy,
-                  'zasoby': zasoby,
-                 })
+                  "lpp_app/osada.html",
+                  {'osada': osada,
+                   'armia': armia,
+                   'budynki': budynki,
+                  })   
 
 
 @login_required
-def obiekty(request, nazwa_profilu=None, kategoria=None, kupiony_obiekt=None, brak_srodkow=False):
-    osada = Osada.objects.filter(user=request.user.profile)[0]
-    obiekty = OsadaObiekt.objects.select_related().filter(osada=osada).order_by('-obiekt__cena')        
+def obiekty(request, nazwa_profilu=None, kategoria=None, utworzony_obiekt=None, brak_zasobow=False):
+    osada = Osada.objects.filter(user=request.user.profile)[0]        
+    print 'obiekt: ', kategoria
 
     if kategoria.startswith('armia'):   # startswitch bo zwraca URL=/armia/kup/rycerz-srebrny,2         
-        armia = [ob for ob in obiekty if ob.obiekt.kategoria.nazwa == 'Armia']
+        armia = Armia_osada.objects.select_related().filter(osada=osada).order_by('-armia__zloto')
 
         return render(request,
                       "lpp_app/armia.html",
                       {'osada': osada, 'armia': armia, 
-                      'kupiony_obiekt': kupiony_obiekt, 
-                      'brak_srodkow': brak_srodkow, })
+                      'utworzony_obiekt': utworzony_obiekt, 
+                      'brak_zasobow': brak_zasobow, })
     elif kategoria.startswith('budynki'):
-        budynki = [ob for ob in obiekty if ob.obiekt.kategoria.nazwa == 'Budynki']
+        budynki = Budynki_osada.objects.select_related().filter(osada=osada).order_by('-budynek__zloto')
 
         return render(request,
                       "lpp_app/budynki.html",
                       {'osada': osada, 'budynki': budynki, 
-                      'kupiony_obiekt': kupiony_obiekt, 
-                      'brak_srodkow': brak_srodkow, })
+                      'utworzony_obiekt': utworzony_obiekt, 
+                      'brak_zasobow': brak_zasobow, })
+    else:        
+        return redirect(reverse('osada'))
+    """
     elif kategoria.startswith('mieszkancy'):
         # TODO: zmienic kategorie Mieszkancy na Ludnosc
         mieszkancy = [ob for ob in obiekty if ob.obiekt.kategoria.nazwa == 'Mieszkancy']
@@ -174,54 +168,57 @@ def obiekty(request, nazwa_profilu=None, kategoria=None, kupiony_obiekt=None, br
         return render(request,
                       "lpp_app/ludnosc.html",
                       {'osada': osada, 'mieszkancy': mieszkancy, 
-                      'kupiony_obiekt': kupiony_obiekt, 
-                      'brak_srodkow': brak_srodkow, })
+                      'utworzony_obiekt': utworzony_obiekt, 
+                      'brak_zasobow': brak_zasobow, })
     elif kategoria.startswith('zasoby'):
         zasoby = [ob for ob in obiekty if ob.obiekt.kategoria.nazwa == 'Zasoby']
 
         return render(request,
                       "lpp_app/zasoby.html",
                       {'osada': osada, 'zasoby': zasoby, 
-                      'kupiony_obiekt': kupiony_obiekt, 
-                      'brak_srodkow': brak_srodkow, })
-    else:        
-        return redirect(reverse('osada'))
+                      'utworzony_obiekt': utworzony_obiekt, 
+                      'brak_zasobow': brak_zasobow, })  
+    """    
+
+
+def utworz_obiekt(request, nazwa_profilu=None, kategoria=None, slug=None, id=None):  
+  print 'kat: ', kategoria
+  osada = Osada.objects.select_related().filter(user=request.user)
+  utworzony_obiekt = None
+  brak_zasobow = False
+
+  if kategoria == 'armia':
+    # bierze obiekt z podanej osady
+    nowy_obiekt = Armia_osada.objects.select_related().filter(osada=osada[0], pk=id)
+    utworzony_obiekt = nowy_obiekt[0].armia.nazwa
+  elif kategoria == 'budynki':
+    nowy_obiekt = Budynki_osada.objects.select_related().filter(osada=osada[0], pk=id)
+    utworzony_obiekt = nowy_obiekt[0].budynek.nazwa
+
+
+  if osada[0].zloto >= nowy_obiekt[0].zloto and \
+    osada[0].drewno >= nowy_obiekt[0].drewno and \
+    osada[0].kamien >= nowy_obiekt[0].kamien and \
+    osada[0].zelazo >= nowy_obiekt[0].zelazo:
+      # aktualizuj ilosc obiektu
+      nowy_obiekt.update(ilosc=F('ilosc') + 1)
+      # aktualna ilosc zlota = osada.zloto - nowy_obiekt.zloto, itd dla drewna,kamienia,zelaza
+      osada.update(zloto=F('zloto') - nowy_obiekt[0].zloto, 
+                   drewno=F('drewno') - nowy_obiekt[0].drewno,
+                   kamien=F('kamien') - nowy_obiekt[0].kamien,
+                   zelazo=F('zelazo') - nowy_obiekt[0].zelazo
+                  )
+      
+  else:    
+    utworzony_obiekt = None
+    brak_zasobow = True
+
+  # pozostan na tej samej stronie
+  return obiekty(request, kategoria=kategoria, utworzony_obiekt=utworzony_obiekt, brak_zasobow=brak_zasobow)
 
 
 @login_required
-def kup(request, nazwa_profilu=None, kategoria=None, slug=None, id=None):
-    osada = Osada.objects.get(user=request.user)
-    kupiony_obiekt = Obiekt.objects.get(pk=id)        
-    brak_srodkow = False
-
-    # pobranie kategorii z ktorej kupilismy obiekt, potrzebne w metodzie obiekt aby
-    # poinformowac w ktorej kategorii zostac
-    kategoria = unicode(kupiony_obiekt.kategoria.nazwa).lower() 
-
-    # aktualizacja krotek funkcja F
-    if osada.budzet > kupiony_obiekt.cena:           
-        OsadaObiekt.objects.filter(osada=osada, obiekt=kupiony_obiekt).update(ilosc=F('ilosc')+1) 
-        Osada.objects.filter(user=request.user).update(budzet=F('budzet')-kupiony_obiekt.cena)                
-        
-        # zwieksz calkowity postep
-        if kupiony_obiekt.kategoria.id == 1:    # armia
-            Osada.objects.filter(user=request.user).update(rozwoj=F('rozwoj')+1)                
-        elif kupiony_obiekt.kategoria.id == 2:    # budynki
-            Osada.objects.filter(user=request.user).update(rozwoj=F('rozwoj')+5)
-        elif kupiony_obiekt.kategoria.id == 3:    # mieszkancy
-            Osada.objects.filter(user=request.user).update(rozwoj=F('rozwoj')+2)
-        elif kupiony_obiekt.kategoria.id == 4:    # zasoby
-            Osada.objects.filter(user=request.user).update(rozwoj=F('rozwoj')+1)
-    else:                
-        kupiony_obiekt = [] 
-        brak_srodkow = True        
-
-    # po kupnie pozostan na tej samej stronie (kategorii)   
-    return obiekty(request, kategoria, kupiony_obiekt, brak_srodkow)
-
-
-@login_required
-def spolecznosc(request):
+def spolecznosc(request, nazwa_profilu=None):    
     osady = Osada.objects.all()
     return render(request, 
                   "lpp_app/spolecznosc.html",
@@ -229,10 +226,26 @@ def spolecznosc(request):
 
 @login_required
 def zaproszenia(request, nazwa_profilu=None):
-    invites = Invites.objects.filter(user_from__user=request.user.profile)
+    sent_invites = Invites.objects.filter(user_from__user=request.user)
+    osady  = [Osada.objects.get(user=inv.user_to) for inv in sent_invites]
+    
+    sent_invites = zip(sent_invites, osady)
+
     return render(request,
                   "lpp_app/zaproszenia.html",
-                  {'invites': invites, })
+                  {'sent_invites': sent_invites, })
+
+@login_required
+def invite(request, nazwa_profilu=None, zapr_osoba=None):
+  u1 = UserProfile.objects.get(user=request.user)
+  u2 = UserProfile.objects.get(user__username=zapr_osoba)    
+  
+  if not Invites.objects.filter(user_from=u1, user_to=u2):
+    Invites.objects.create(user_from=u1, user_to=u2)    
+
+  #  Invites.objects..create(user_from=)
+
+  return redirect(reverse("zaproszenia", args=(nazwa_profilu,)))
 
 @login_required
 def friends(request, nazwa_profilu=None):
@@ -241,12 +254,12 @@ def friends(request, nazwa_profilu=None):
                   "lpp_app/friends.html")
 
 @login_required
-def market(request):
+def market(request, nazwa_profilu=None):
     return render(request,
                   "lpp_app/market.html")
 
 @login_required
-def pojedynki(request):
+def pojedynki(request, nazwa_profilu=None):
   return render(request,
                 "lpp_app/pojedynki.html")
 
@@ -254,3 +267,24 @@ def pojedynki(request):
 def statystyki(request, nazwa_profilu=None):
   return render(request,
                "lpp_app/statystyki.html")
+
+
+@login_required
+def wizytowka(request, nazwa_osady=None):  
+  osada = Osada.objects.select_related().get(nazwa=nazwa_osady)    
+  invited = False
+
+  # sprawdza czy zalogowany user zaprosil dana osade, 
+  # zmienna invited okresla czy button "Zapros" bedzie widoczny
+  # :user_from jest profilem dlatego request.user.profile
+  # :user_to bierze osada.user ktora jest profilem
+  if request.user.profile == osada.user:  # swoj profil, nie wyswietlaj zapros
+    invited = True
+  elif Invites.objects.filter(user_from=request.user.profile, user_to=osada.user):
+    invited = True  
+
+  return render(request,
+                "lpp_app/wizytowka.html",
+                {'osada': osada,
+                 'invited': invited,
+                })

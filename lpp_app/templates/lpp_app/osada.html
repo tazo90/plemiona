@@ -17,26 +17,89 @@
     </div>
 
     <div class="panel left">
-        <a class="btn" href="{% url profil request.user.profile %}">Powrót</a>
-        <table class="table table-hover" style="margin-left:20px; width:350px">            
+        <p class="text-center">Rozbuduj osadę</p>
+        <a class="btn" href="{% url profil request.user.profile %}">Powrót</a>        
+        <table class="table table-hover" style="margin-left:20px; width:350px">
             <thead>
                 <tr>
-                <th>Nr.</th>
-                <th>Typ</th>                    
-                </tr>
+                    <th>Nr.</th>
+                    <th>Typ</th>
             </thead>
             <tbody>
-                <tr><td class="span1">1.</td><td><a href="{% url obiekty user.profile 'armia' %}">Armia</a></td></tr>
-                <tr><td class="span1">2.</td><td><a href="{% url obiekty user.profile 'budynki' %}">Budynki</a></td></tr>
-                <tr><td class="span1">3.</td><td><a href="{% url obiekty user.profile 'mieszkancy' %}">Ludność</a></td></tr>
-                <tr><td class="span1">4.</td><td><a href="{% url obiekty user.profile 'zasoby' %}">Zasoby</a></td></tr>
+                <tr><td class="span1">1.</td><td><a href="{% url obiekty request.user.profile 'armia' %}">Armia</a></td></tr>
+                <tr><td class="span1">2.</td><td><a href="{% url obiekty request.user.profile 'budynki' %}">Budynki</a></td></tr>
             </tbody>
-        </table>        
+        </table>
     </div>
 
     <div class="panel right">
+        <p class="text-center">Obiekty w osadzie</p>
+        <table class="table table-hover" style="margin-left:20px; width:350px">
+            <thead>
+                <tr>
+                    <th>Typ</th>
+                    <th>Ilość</th>
+                    <th>Wyprodukowano</th>
+            </thead>
+            <tbody>                                
+                {% for ar in armia %}                    
+                <tr>
+                    <td class="span3"><a href="{{ ar.get_absolute_url }}">{{ ar.armia.nazwa }}</a></td>
+                    <td>{{ ar.ilosc }}</td>
+                </tr>                    
+                {% endfor %}                
+
+                {% for bud in budynki %}                    
+                <tr>
+                    <td class="span3" id="obiekt_nazwa">{{ bud.budynek.nazwa }}</td>
+                    <td>{{ bud.ilosc }}</td>                        
+                    {#<td id="time_taken">{{ bud.produkcja }} {{ bud.budynek.jednostka_prod }}</td>#}
+                    <td id="time_taken">{{ bud.produkcja }} {{ bud.budynek.jednostka_prod }}</td>
+                </tr>                    
+                {% endfor %}                
+            </tbody>
+        </table>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {    
+
+    var seconds = 5;        // co ile sekund zapisywac w bazie
+    var isPulse=true;
+     
+    function heartbeat(){
+        if(isPulse){
+            var hb = setTimeout(heartbeat, seconds*1000); 
+ 
+            var counter = $("#time_taken").text();
+            var obiekt_nazwa = $("#obiekt_nazwa").text();
+
+            $.ajax({
+                url: "{% url osada request.user.profile %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    'counter': counter, 
+                    'obiekt_nazwa': obiekt_nazwa,               
+                },
+                success: function(json) {
+                    $("#time_taken").append(" Odpowiedzial");
+                }
+            });
+            //process stuff here
+ 
+            //isPulse can be whatever you want. 
+            //It just needs to be something that will stop the recursive loop--an error condition, perhaps.
+            //Having a condition to stop this is a good idea, otherwise it will start acting like a memory leak.
+            //You could change the condition to be an amount of time, number of loops, or some other condition.
+        }
+    }
+  
+    //function call is here
+    var hb = setTimeout(heartbeat, seconds*1000);  //beat every 5 minutes 
+});
+</script>
 
 {% endblock %}
 

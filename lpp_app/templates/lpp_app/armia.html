@@ -16,36 +16,43 @@
         {% show_status_bar %}
     </div>
 
-    <div class="panel left">
+    <div class="panel left left-wide">
         <a class="btn" href="{{ osada.get_absolute_url }}">Powrót</a>
         <span style="margin: 10px; font-size: 18px;">
-            {% if kupiony_obiekt %}<span style="color:green">Kupiłeś: {{ kupiony_obiekt.nazwa }}</span>{% endif %}        
-            {% if brak_srodkow %}<span style="color:red">Brak srodków w budżecie</span>{% endif %}
+            {% if utworzony_obiekt %}<span style="color:green">Utworzyłeś: {{ utworzony_obiekt }}</span>{% endif %}        
+            {% if brak_zasobow %}<span style="color:red">Nie masz wystarczającej ilości zasobów do wybudowania tego wojownika.</span>{% endif %}
         </span>
-        <table class="table table-hover">            
+        <table class="table table-hover">   
             <thead>
                 <tr>
-                <th>Typ wojownika</th>
-                <th>Ilość</th>                    
-                <th>Cena</th>
-                <th></th>
+                <th>Typ</th>
+                <th>Poziom</th>                    
+                <th>Twoja ilość</th>
+                <th>Złoto</th>
+                <th>Drewno</th>
+                <th>Kamien</td>
+                <th>Żelazo</th>                
+                <th>Nowa postać</th>
                 </tr>
             </thead>
             <tbody>
                 {% for ar in armia %}
                     <tr>                        
-                        <td class="span3"><a href="#">{{ ar.obiekt.nazwa }}</a></td>
-                        <td class="span2">{{ ar.ilosc }}</a></td>
-                        <td class="span2">{{ ar.obiekt.cena }} &#36;</a></td>                        
-                        <td class="span2"><a href="{{ ar.obiekt.get_absolute_url }}">Kup</a></td>
-                        <td></td>
+                        <td class="span3"><a href="#">{{ ar.armia.nazwa }}</a></td>
+                        <td>{{ ar.poziom }}</td>
+                        <td>{{ ar.ilosc }}</a></td>
+                        <td>{{ ar.zloto }}</a></td>                                                
+                        <td>{{ ar.drewno }}</td>
+                        <td>{{ ar.kamien }}</td>
+                        <td>{{ ar.zelazo }}</td>                        
+                        <td><a href="{{ ar.get_absolute_url }}">Utwórz</a></td>
                     </tr>
                 {% endfor %}                
-            </tbody>
+            </tbody>         
         </table>           
     </div>
 
-    <div class="panel right">
+    <div class="panel right right-short">
     </div>
 </div>
 

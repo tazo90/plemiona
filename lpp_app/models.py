@@ -66,17 +66,23 @@ class Osada(models.Model):
 
 class Budynki(models.Model):
     nazwa = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=130, null=True, editable=False)    
     koszt = models.IntegerField()    
     zloto = models.IntegerField()
     drewno = models.IntegerField()
     kamien = models.IntegerField()
     zelazo = models.IntegerField()
     produktywnosc = models.IntegerField()    
+    jednostka_prod = models.CharField(max_length=30, null=True, blank=True)
     max_pojemnosc = models.IntegerField()
     max_poziom = models.IntegerField()
 
     def __unicode__(self):
-        return "%s" % (self.nazwa)    
+        return "%s" % (self.nazwa)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.nazwa)
+        super(Budynki, self).save(*args, **kwargs)   
 
 class Budynki_osada(models.Model):
     osada = models.ForeignKey(Osada, null=True, blank=True)
@@ -88,13 +94,26 @@ class Budynki_osada(models.Model):
     kamien = models.IntegerField(null=True, default=0)
     zelazo = models.IntegerField(null=True, default=0)
     produktywnosc = models.IntegerField(null=True, default=0)
+    produkcja = models.IntegerField(null=True, default=0)    
     max_pojemnosc = models.IntegerField(null=True, default=0)
 
     def __unicode__(self):
-        return "%s" % (self.budynek.nazwa)
+        return "%s" % (self.budynek.nazwa)  
+
+    # posredniczaco odwolujemy sie do tabel Osady(pobrac nazwe usera) i Budynki(slug field)
+    @models.permalink
+    def get_absolute_url(self):
+        return('utworz_obiekt', (), {
+            'nazwa_profilu': self.osada.user,
+            'kategoria': 'budynki',
+            'slug': self.budynek.slug,
+            'id': self.id,
+            })
+
 
 class Armia(models.Model):
     nazwa = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=130, null=True, editable=False)
     koszt = models.IntegerField()
     atak = models.IntegerField()
     obrona = models.IntegerField()
@@ -107,6 +126,10 @@ class Armia(models.Model):
     def __unicode__(self):
         return "%s" % (self.nazwa)
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.nazwa)
+        super(Armia, self).save(*args, **kwargs)
+
 
 class Armia_osada(models.Model):    
     osada = models.ForeignKey(Osada, null=True, blank=True)
@@ -116,10 +139,19 @@ class Armia_osada(models.Model):
     zloto = models.IntegerField(null=True, default=0)
     drewno = models.IntegerField(null=True, default=0)
     kamien = models.IntegerField(null=True, default=0)
-    zelazo = models.IntegerField(null=True, default=0)
+    zelazo = models.IntegerField(null=True, default=0)    
 
     def __unicode__(self):
         return "%s" % (self.armia.nazwa)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return('utworz_obiekt', (), {
+            'nazwa_profilu': self.osada.user,
+            'kategoria': 'armia',
+            'slug': self.armia.slug,
+            'id': self.id,
+            })
 
 
 class Kategoria(models.Model):

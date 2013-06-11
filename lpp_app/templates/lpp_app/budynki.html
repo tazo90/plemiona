@@ -16,36 +16,47 @@
         {% show_status_bar %}
     </div>
 
-    <div class="panel left">
+    <div class="panel left left-wide">
         <a class="btn" href="{{ osada.get_absolute_url }}">Powrót</a>
         <span style="margin: 10px; font-size: 18px;">
-            {% if kupiony_obiekt %}<span style="color:green">Kupiłeś: {{ kupiony_obiekt.nazwa }}</span>{% endif %}        
-            {% if brak_srodkow %}<span style="color:red">Brak srodków w budżecie</span>{% endif %}
+            {% if utworzony_obiekt %}<span style="color:green">Zbudowano: {{ utworzony_obiekt }}</span>{% endif %}        
+            {% if brak_zasobow %}<span style="color:red">Nie masz wystarczającej ilości zasobów do wybudowania tego budynku.</span>{% endif %}
         </span>
         <table class="table table-hover">            
             <thead>
                 <tr>
                 <th>Typ budynki</th>
-                <th>Ilość</th>                    
-                <th>Cena</th>
-                <th></th>
+                <th>Poziom</th>                    
+                <th>Twoja ilość</th>
+                <th>Złoto</th>
+                <th>Drewno</th>
+                <th>Kamien</td>
+                <th>Żelazo</th>
+                <th>Produktywnosc</th>
+                <th>Max Pojemność</th>
+                <th>Nowy budynek</th>
                 </tr>
             </thead>
             <tbody>
                 {% for bud in budynki %}
                     <tr>                        
-                        <td class="span3"><a href="#">{{ bud.obiekt.nazwa }}</a></td>
-                        <td class="span2">{{ bud.ilosc }}</a></td>
-                        <td class="span2">{{ bud.obiekt.cena }} &#36;</a></td>                        
-                        <td class="span2"><a href="{{ bud.obiekt.get_absolute_url }}">Kup</a></td>
-                        <td></td>
+                        <td class="span3"><a href="#">{{ bud.budynek.nazwa }}</a></td>
+                        <td>{{ bud.poziom }}</td>
+                        <td>{{ bud.ilosc }}</a></td>
+                        <td>{{ bud.zloto }}</a></td>                                                
+                        <td>{{ bud.drewno }}</td>
+                        <td>{{ bud.kamien }}</td>
+                        <td>{{ bud.zelazo }}</td>
+                        <td>{{ bud.produktywnosc }} zasób/min</td>
+                        <td>{{ bud.max_pojemnosc }}</td>
+                        <td><a href="{{ bud.get_absolute_url }}">Buduj</a></td>
                     </tr>
                 {% endfor %}                
             </tbody>
         </table>           
     </div>
 
-    <div class="panel right">
+    <div class="panel right right-short">
     </div>
 </div>
 

@@ -16,8 +16,9 @@
         {% show_status_bar %}
     </div> 
 
-    <div class="panel left">                        
-        <div class="menu">
+    <div class="panel left">  
+        <p class="text-center">Lista osad</p>                      
+        <div class="menu spolecznosc">
             <table class="table table-hover">            
             <thead>
                 <tr>
@@ -30,7 +31,7 @@
                 {% for osada in osady %}
                     <tr>     
                         <td>{{ forloop.counter }}</td>
-                        <td class="span3"><a href="{{ osada.get_absolute_url }}">{{ osada.nazwa }}</a></td>
+                        <td class="span3"><a href="{% url wizytowka osada.nazwa %}">{{ osada.nazwa }}</a></td>
                         <td class="span2">{{ osada.user }}</td>                                                
                     </tr>
                 {% endfor %}                
