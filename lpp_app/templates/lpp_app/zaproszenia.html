@@ -15,8 +15,9 @@
         {% show_status_bar %}
     </div> 
 
-    <div class="panel left">                        
+    <div class="panel left">           
         <p class="text-center">Wysłane zaproszenia</p> 
+        <a class="btn btn-success" href="{% url profil request.user %}">Powrót</a>                         
         <table class="table table-hover" style="margin-left:20px; width:350px">
             <thead>
                 <tr>
@@ -30,7 +31,8 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td class="span3"><a href="{% url wizytowka invite.1 %}">{{ invite.1 }}</a></td>
-                    <td class="span3">{{ invite.0.user_to }}</td>                    
+                    <td class="span3">{{ invite.0.user_to }}</td>
+                    <td><a href="{% url invite_delete request.user invite.0.user_to %}" class="btn btn-warning btn-small">Usuń</a></td>                    
                 </tr>                
                 {% endfor %}
             </tbody>
@@ -45,6 +47,7 @@
                     <th>Nr.</th>
                     <th>Nazwa osady</th>
                     <th>Nazwa wodza</th>                    
+                    <th>Usun zaproszenie</th>
                     <th></th>
             </thead>
             <tbody>
@@ -52,7 +55,9 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td class="span3"><a href="{% url wizytowka invite.1 %}">{{ invite.1 }}</a></td>
-                    <td class="span3">{{ invite.0.user_to }}</td>                    
+                    <td class="span3">{{ invite.0.user_to }}</td>   
+                    <td><a href="#" class="btn btn-success btn-small">Akceptuj</a></td>
+                    <td><a href="#" class="btn btn-danger btn-small">Usuń</a></td>
                 </tr>                
                 {% endfor %}
             </tbody>

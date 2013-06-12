@@ -17,6 +17,25 @@
 
     <div class="panel left">                        
         <p class="text-center">Zaprzyjaznione osady</p>
+        <a class="btn btn-success" href="{% url profil request.user %}">Powrót</a>
+        <table class="table table-hover" style="margin-left:20px; width:350px">
+            <thead>
+                <tr>
+                    <th>Nr.</th>
+                    <th>Nazwa osady</th>
+                    <th>Nazwa wodza</th>                    
+                    <th></th>
+            </thead>
+            <tbody>
+                {% for friend in friends %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="span3"><a href="{% url wizytowka friend.1 %}">{{ friend.1 }}</a></td>
+                    <td class="span3">{{ friend.0.user }}</td>
+                </tr>                
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

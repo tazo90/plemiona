@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block login %}
+    {% with user.username as username %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block slider %}{% endblock %}
+{% block news %}{% endblock %}
+
+{% block content %}
+<div class="profil">
+   <div class="panel top">
+        {% load status_bar %}
+        {% show_status_bar %}
+    </div> 
+
+    <div class="panel left"> 
+        <p class="text-center">Oferta handlowa</p>            
+        <a class="btn btn-success" href="{% url profil request.user %}">Powrót</a>                       
+        <table class="table table-hover" style="margin-left:20px; width:350px">
+            <thead>
+                <tr>
+                    <th>Nr.</th>
+                    <th>Nazwa osady</th>
+                    <th>Surowiec 1</th>                    
+                    <th>Ilosc</th>
+                    <th>Surowiec 2</th>
+                    <th>Ilosc</th>
+            </thead>
+            <tbody>
+                {% for prod in oferta %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="span3">{{ prod.osada }}</td>                    
+                    <td class="span2">{{ prod.surowiec1 }}</td>
+                    <td class="span1">{{ prod.ilosc1 }}</td>
+                    <td class="span2">{{ prod.surowiec2 }}</td>
+                    <td class="span1">{{ prod.ilosc2 }}</td>
+                </tr>                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel right">        
+        <p class="text-center">Dodaj nową ofertę</p>
+        <form method="post">{% csrf_token %}
+            {% for field in handel_form %}
+            <table>
+                <tr><td style="width:150px">{{ field.label_tag }}</td><td>{{ field }}</td></tr>
+            </table>
+            {% endfor %}
+            <br />
+            <input type="submit" value="Dodaj">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+

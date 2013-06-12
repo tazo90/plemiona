@@ -1,6 +1,6 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch.dispatcher import receiver
-from .models import Osada, Kategoria, Obiekt, OsadaObiekt
+from .models import Osada
 from .models import Armia, Armia_osada, Budynki, Budynki_osada
 
 """

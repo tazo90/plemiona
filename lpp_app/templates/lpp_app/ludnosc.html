@@ -17,7 +17,7 @@
     </div>
 
     <div class="panel left">
-        <a class="btn" href="{{ osada.get_absolute_url }}">Powrót</a>
+        <a class="btn btn-success" href="{{ osada.get_absolute_url }}">Powrót</a>
         <span style="margin: 10px; font-size: 18px;">
             {% if kupiony_obiekt %}<span style="color:green">Kupiłeś: {{ kupiony_obiekt.nazwa }}</span>{% endif %}        
             {% if brak_srodkow %}<span style="color:red">Brak srodków w budżecie</span>{% endif %}

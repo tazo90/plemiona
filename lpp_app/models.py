@@ -31,7 +31,16 @@ class Invites(models.Model):
 
 
 class Friends(models.Model):
-    has_friends = models.ManyToManyField(UserProfile, related_name='is_friend_of')
+    #has_friends = models.ManyToManyField(UserProfile, related_name='is_friend_of')
+    user1 = models.ForeignKey(UserProfile, related_name="user1")
+    user2 = models.ForeignKey(UserProfile, related_name="user2")
+
+    class Meta:
+        unique_together = ('user1', 'user2')
+
+    def __unicode__(self):
+        return "%s %s" % (self.user1.user.username, self.user2.user.username)
+  
 
 
 class Osada(models.Model):
@@ -39,10 +48,10 @@ class Osada(models.Model):
     slug = models.SlugField(max_length=150, editable=False)
     user = models.OneToOneField(UserProfile)
     #budzet = models.IntegerField(null=True, default=8000)
-    zloto = models.IntegerField(null=True, default=10)
-    drewno = models.IntegerField(default=200)
-    kamien = models.IntegerField(default=300)
-    zelazo = models.IntegerField(default=80)
+    zloto = models.IntegerField(null=True, default=150)
+    drewno = models.IntegerField(default=500)
+    kamien = models.IntegerField(default=350)
+    zelazo = models.IntegerField(default=270)
     rozwoj = models.IntegerField(null=True, default=2)
     data_powstania = models.DateTimeField(auto_now_add=True)
 
@@ -64,6 +73,25 @@ class Osada(models.Model):
         super(Osada, self).save(*args, **kwargs)
 
 
+class Handel(models.Model):
+    ZASOBY = (
+        ('zloto', 'Zloto'),
+        ('drewno', 'Drewno'),
+        ('kamien', 'Kamien'),
+        ('zelazo', 'Zelazo'),
+    )
+
+    osada = models.ForeignKey(Osada)
+    surowiec1 = models.CharField("oferuje", max_length=10, blank=False, choices=ZASOBY, default='z')
+    ilosc1 = models.IntegerField("w ilosci")
+    surowiec2 = models.CharField("w zamian za", max_length=10, blank=False, choices=ZASOBY, default='z')
+    ilosc2 = models.IntegerField("w ilosci")
+
+    def __unicode__(self):
+        return "%s %s %s" % (self.osada.nazwa, self.surowiec1, self.surowiec2)
+
+
+
 class Budynki(models.Model):
     nazwa = models.CharField(max_length=120)
     slug = models.SlugField(max_length=130, null=True, editable=False)    
@@ -75,7 +103,7 @@ class Budynki(models.Model):
     produktywnosc = models.IntegerField()    
     jednostka_prod = models.CharField(max_length=30, null=True, blank=True)
     max_pojemnosc = models.IntegerField()
-    max_poziom = models.IntegerField()
+    max_level = models.IntegerField()
 
     def __unicode__(self):
         return "%s" % (self.nazwa)
@@ -113,8 +141,9 @@ class Budynki_osada(models.Model):
 
 class Armia(models.Model):
     nazwa = models.CharField(max_length=120)
+    budynek = models.ForeignKey(Budynki)
     slug = models.SlugField(max_length=130, null=True, editable=False)
-    koszt = models.IntegerField()
+    koszt = models.IntegerField(null=True, blank=True)
     atak = models.IntegerField()
     obrona = models.IntegerField()
     zbroja = models.IntegerField()
@@ -153,49 +182,3 @@ class Armia_osada(models.Model):
             'id': self.id,
             })
 
-
-class Kategoria(models.Model):
-    nazwa = models.CharField(max_length=50)
-    url = models.CharField(max_length=30, null=True)
-
-    def __unicode__(self):
-        return self.nazwa
-
-
-class Obiekt(models.Model):
-    nazwa = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, editable=False)
-    kategoria = models.ForeignKey(Kategoria)    
-    cena = models.IntegerField() 
-    poczatkowa_ilosc = models.IntegerField(null=True, default=0)       
-    max_ilosc = models.IntegerField()    
-
-    def __unicode__(self):
-        return self.nazwa
-
-    @models.permalink
-    # skrot od: {% url kup ar.obiekt.slug ar.obiekt.id %}
-    def get_absolute_url(self):
-        return ('kup', (), {    
-            'nazwa_profilu': 'test-usunac',                
-            'kategoria': unicode(self.kategoria).lower(),
-            'slug': self.slug,
-            'id': self.id,
-            })
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.nazwa)
-        super(Obiekt, self).save(*args, **kwargs)
-
-#Osada.obiekty = property(lambda u: Obiekt.objects.get_or_create(osada=u))
-
-class OsadaObiekt(models.Model):
-    osada = models.ForeignKey(Osada)
-    obiekt = models.ForeignKey(Obiekt)
-    ilosc = models.IntegerField(null=True, blank=True, default=0)
-
-    class Meta:
-        unique_together = ("osada", "obiekt")
-
-    def __unicode__(self):
-        return u'%s %s' % (self.osada.nazwa, self.obiekt.nazwa)

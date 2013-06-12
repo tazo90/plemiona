@@ -17,7 +17,7 @@
     </div> 
 
     <div class="panel left">                        
-        <p class="text-center">Centrum</p>
+        <p class="text-center">Panel Główny</p>
         <div class="menu">
             <ul>                
                 {% if osada %}
@@ -27,7 +27,7 @@
                 {% endif %}
                 <li><a href="{% url zaproszenia user %}">Zaproszenia</a></li>
                 <li><a href="{% url friends user %}">Zaprzyjaznione osady</a></li>
-                <li><a href="{% url market user %}">Market</a></li>
+                <li><a href="{% url handel user %}">Handel</a></li>
                 <li><a href="{% url statystyki user %}">Statystyki</a></li>
                 <li><a href="{% url edycja_profilu user %}">Edytuj profil</a></li>
             </ul>

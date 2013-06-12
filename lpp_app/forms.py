@@ -2,8 +2,9 @@
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Osada
+from .models import Osada, Handel
 from django.utils.html import strip_tags
+
 
 class UserCreateForm(UserCreationForm):
     email = forms.EmailField(required=True, widget=forms.widgets.TextInput(attrs={'placeholder': 'Email'}))
@@ -38,7 +39,24 @@ class AuthenticateForm(AuthenticationForm):
 
 
 class OsadaForm(forms.ModelForm):
+    nazwa = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={'placeholder': 'Nazwa osady'}))
     class Meta:
         model = Osada        
         fields = ('nazwa', )
 
+
+
+class HandelForm(forms.ModelForm):
+
+    class Meta:
+        model = Handel  
+        fields = ('surowiec1', 'ilosc1', 'surowiec2', 'ilosc2')      
+
+    def __init__(self, *args, **kwargs):
+        super(HandelForm, self).__init__(*args, **kwargs)
+
+        for key in self.fields:
+            self.fields[key].required = True
+
+        #self.fields['surowiec1'].empty_label = None
+        #self.fields['surowiec2'].empty_label = None

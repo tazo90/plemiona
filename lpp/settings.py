@@ -131,7 +131,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'lpp_app',  
     'django_extensions',  
-    'south',
+    #'south',
     # Uncomment the next line to enable the admin:
      #'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -166,8 +166,3 @@ LOGGING = {
         },
     }
 }
-
-import dj_database_url
-DATABASES['default'] = dj_database_url.config()
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

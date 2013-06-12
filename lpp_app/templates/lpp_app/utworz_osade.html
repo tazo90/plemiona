@@ -10,11 +10,25 @@
 
 {% block content %}
 
-<form action="{% url nowa_osada request.user.profile %}" method="post">{% csrf_token %}
-    {{ osada_form.as_table }}
-    <br>
-    <input type="submit" value="Utwórz">
-</form>
+<div class="profil">
+    <div class="panel top">
+        {% load status_bar %}
+        {% show_status_bar %}
+    </div>
+
+    <div class="panel left">
+        <p class="text-center">Tworzenie nowej osady</p>
+        <div class="text-center" style="padding-top: 40px">
+            <form action="{% url nowa_osada request.user.profile %}" method="post">{% csrf_token %}                
+                {% for field in osada_form %}
+                {{ field }}
+                {% endfor %}
+                <br>
+                <input style="width:164px" type="submit" value="Utwórz">
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 

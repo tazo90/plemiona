@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-from .forms import AuthenticateForm, UserCreateForm, OsadaForm
-from django.core.urlresolvers import reverse
-from .models import Osada, OsadaObiekt, Obiekt, UserProfile, Invites, Friends, Armia, Armia_osada, Budynki, Budynki_osada
-from django.db.models import F
 from django.contrib.auth.decorators import login_required
+
+from django.core.urlresolvers import reverse
+from django.db.models import F, Q
+from django.shortcuts import render, redirect
+
+from .forms import AuthenticateForm, UserCreateForm, OsadaForm, HandelForm
+from .models import Osada, Handel, UserProfile, Invites, Friends, Armia, Armia_osada, Budynki, Budynki_osada
 
 def index(request, auth_form=None, user_form=None):
     # User is logged
@@ -17,16 +19,9 @@ def index(request, auth_form=None, user_form=None):
         if osada:
             osada = osada[0]    
 
-        
-        """return render(request, 
-                      "lpp_app/profil.html",
-                      {'user': user, 'next_url': '/', 'osada': osada, })    
-        """
         return render(request, 
                       "lpp_app/home.html",
-                      {'user': user, 'next_url': '/', 'osada': osada, })    
-        
-        #return profil(request)
+                      {'user': user, 'next_url': '/', 'osada': osada, })                    
 
     else:    
         # User is not logged in
@@ -38,6 +33,7 @@ def index(request, auth_form=None, user_form=None):
                      {'auth_form': auth_form, })
 
 
+
 def profil(request, nazwa_profilu=None):
     user = request.user
     osada = Osada.objects.filter(user=user.profile)    
@@ -47,6 +43,8 @@ def profil(request, nazwa_profilu=None):
     return render(request,
                   "lpp_app/profil.html",
                   {'user': user, 'osada': osada, })
+
+
 
 def login_view(request):
     if request.method == 'POST':        
@@ -105,7 +103,7 @@ def nowa_osada(request, nazwa_profilu=None, osada_form=None):
             osada = osada_form.save(commit=False)
             osada.user = request.user.profile
             osada.save()            
-            return redirect('/')
+            return redirect(reverse('profil', args=(nazwa_profilu,)))
         else:
             return nowa_osada(request, osada_form=osada_form)
     
@@ -140,10 +138,9 @@ def osada(request, nazwa_profilu=None):
 @login_required
 def obiekty(request, nazwa_profilu=None, kategoria=None, utworzony_obiekt=None, brak_zasobow=False):
     osada = Osada.objects.filter(user=request.user.profile)[0]        
-    print 'obiekt: ', kategoria
 
     if kategoria.startswith('armia'):   # startswitch bo zwraca URL=/armia/kup/rycerz-srebrny,2         
-        armia = Armia_osada.objects.select_related().filter(osada=osada).order_by('-armia__zloto')
+        armia = Armia_osada.objects.select_related().filter(osada=osada).order_by('armia__nazwa')
 
         return render(request,
                       "lpp_app/armia.html",
@@ -151,7 +148,7 @@ def obiekty(request, nazwa_profilu=None, kategoria=None, utworzony_obiekt=None, 
                       'utworzony_obiekt': utworzony_obiekt, 
                       'brak_zasobow': brak_zasobow, })
     elif kategoria.startswith('budynki'):
-        budynki = Budynki_osada.objects.select_related().filter(osada=osada).order_by('-budynek__zloto')
+        budynki = Budynki_osada.objects.select_related().filter(osada=osada).order_by('budynek__nazwa')
 
         return render(request,
                       "lpp_app/budynki.html",
@@ -160,25 +157,8 @@ def obiekty(request, nazwa_profilu=None, kategoria=None, utworzony_obiekt=None, 
                       'brak_zasobow': brak_zasobow, })
     else:        
         return redirect(reverse('osada'))
-    """
-    elif kategoria.startswith('mieszkancy'):
-        # TODO: zmienic kategorie Mieszkancy na Ludnosc
-        mieszkancy = [ob for ob in obiekty if ob.obiekt.kategoria.nazwa == 'Mieszkancy']
 
-        return render(request,
-                      "lpp_app/ludnosc.html",
-                      {'osada': osada, 'mieszkancy': mieszkancy, 
-                      'utworzony_obiekt': utworzony_obiekt, 
-                      'brak_zasobow': brak_zasobow, })
-    elif kategoria.startswith('zasoby'):
-        zasoby = [ob for ob in obiekty if ob.obiekt.kategoria.nazwa == 'Zasoby']
-
-        return render(request,
-                      "lpp_app/zasoby.html",
-                      {'osada': osada, 'zasoby': zasoby, 
-                      'utworzony_obiekt': utworzony_obiekt, 
-                      'brak_zasobow': brak_zasobow, })  
-    """    
+ 
 
 
 def utworz_obiekt(request, nazwa_profilu=None, kategoria=None, slug=None, id=None):  
@@ -227,7 +207,7 @@ def spolecznosc(request, nazwa_profilu=None):
 @login_required
 def zaproszenia(request, nazwa_profilu=None):
     sent_invites = Invites.objects.filter(user_from__user=request.user)
-    receive_invites = Invites.objects.filter(user_to__user=request.user)
+    receive_invites = Invites.objects.filter(user_to__user=request.user)    
     
     osady1 = [Osada.objects.get(user=inv.user_to) for inv in sent_invites]
     osady2 = [Osada.objects.get(user=inv.user_from) for inv in receive_invites] 
@@ -238,7 +218,7 @@ def zaproszenia(request, nazwa_profilu=None):
     return render(request,
                   "lpp_app/zaproszenia.html",
                   {'sent_invites': sent_invites, 
-                   'receive_invites': receive_invites,
+                   'receive_invites': receive_invites,                   
                   })
 
 @login_required
@@ -251,16 +231,56 @@ def invite(request, nazwa_profilu=None, zapr_osoba=None):
 
   return redirect(reverse("zaproszenia", args=(nazwa_profilu,)))
 
-@login_required
-def friends(request, nazwa_profilu=None):
-    #friends = Friends.objects.filter(user_from__user=request.user.profile)
-    return render(request,
-                  "lpp_app/friends.html")
 
 @login_required
-def market(request, nazwa_profilu=None):
+def invite_delete(request, nazwa_profilu=None, zapr_osoba=None):
+  u1 = UserProfile.objects.get(user=request.user)  
+  u2 = UserProfile.objects.get(user__username=zapr_osoba)
+
+  Invites.objects.get(user_from=u1, user_to=u2).delete()
+
+  return redirect(reverse("zaproszenia", args=(nazwa_profilu,)))
+
+
+@login_required
+def friends(request, nazwa_profilu=None):
+
+    friends = Friends.objects.filter(
+      Q(user1=request.user) | Q(user2=request.user)
+    )
+    
+    """ bierze naszych wszystkich przyjacieli i wrzuca krotke do listy postaci (user,osada) """  
+    res = []
+    for friend in friends:
+      if friend.user1 != request.user.profile:
+        res.append( (friend.user1, Osada.objects.get(user=friend.user1)) )        
+      elif friend.user2 != request.user.profile:
+        res.append( (friend.user2, Osada.objects.get(user=friend.user2)) )        
+        
+
     return render(request,
-                  "lpp_app/market.html")
+                  "lpp_app/friends.html",
+                  {'friends': res,})
+
+@login_required
+def handel(request, nazwa_profilu=None):
+    if request.method == "POST":         
+        handel_form = HandelForm(data=request.POST)
+        if handel_form.is_valid():
+            handel = handel_form.save(commit=False)
+            handel.osada = Osada.objects.get(user=request.user)
+            handel.save()            
+            return redirect(reverse('profil', args=(nazwa_profilu,)))
+        else:
+            return handel(request, handel_form=handel_form)
+    
+    handel_form = HandelForm()  
+    oferta = Handel.objects.filter(osada=Osada.objects.get(user=request.user))  
+    return render(request,
+                  "lpp_app/handel.html",
+                  {'handel_form': handel_form, 
+                   'oferta': oferta,})
+
 
 @login_required
 def pojedynki(request, nazwa_profilu=None):
@@ -286,7 +306,9 @@ def wizytowka(request, nazwa_osady=None):
     invited = True
   elif Invites.objects.filter(user_from=request.user.profile, user_to=osada.user):
     invited = True  
-
+  elif Friends.objects.extra(select={'invited': 'select count(*) from lpp_app_friends where (user1_id=1 and user2_id=2) or (user1_id=2 and user2_id=1)'},):
+      invited = True  
+  
   return render(request,
                 "lpp_app/wizytowka.html",
                 {'osada': osada,
