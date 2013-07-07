@@ -7,8 +7,8 @@ $(document).ready(function()
 
     window.setInterval(function() {                    
         time += 1;          
-        if (time % 5 == 0) {       
-            produced += 1;
+        if (time % 10 == 0) {       
+            produced += 30;
             $("#time_taken").text("");
             $("#time_taken").text(produced + ' ' + jednostka);
         }       

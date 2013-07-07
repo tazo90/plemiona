@@ -46,8 +46,9 @@
                 <tr>
                     <th>Nr.</th>
                     <th>Nazwa osady</th>
-                    <th>Nazwa wodza</th>                    
-                    <th>Usun zaproszenie</th>
+                    <th>Nazwa wodza</th> 
+                    <th>Akceptuj</th>                   
+                    <th>Odrzuć</th>
                     <th></th>
             </thead>
             <tbody>
@@ -55,9 +56,9 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td class="span3"><a href="{% url wizytowka invite.1 %}">{{ invite.1 }}</a></td>
-                    <td class="span3">{{ invite.0.user_to }}</td>   
-                    <td><a href="#" class="btn btn-success btn-small">Akceptuj</a></td>
-                    <td><a href="#" class="btn btn-danger btn-small">Usuń</a></td>
+                    <td class="span3">{{ invite.0.user_from }}</td>   
+                    <td><a href="{% url invite_accept request.user invite.0.user_from %}" class="btn btn-success btn-small">Akceptuj</a></td>
+                    <td><a href="{% url invite_delete request.user invite.0.user_from %}" class="btn btn-danger btn-small">Odrzuć</a></td>
                 </tr>                
                 {% endfor %}
             </tbody>

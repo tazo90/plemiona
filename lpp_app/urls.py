@@ -6,7 +6,10 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('lpp_app.views',    
 
     url(r'^(?P<nazwa_profilu>.+)/pojedynki/$', 'pojedynki', name='pojedynki'),
+    
     url(r'^(?P<nazwa_profilu>.+)/handel/$', 'handel', name='handel'),
+    url(r'^(?P<nazwa_profilu>.+)/handel/(?P<sur1>.+),(?P<ile1>\d+)/(?P<sur2>.+),(?P<ile2>\d+)/$', 'wymiana', name='wymiana'),
+
     url(r'^(?P<nazwa_profilu>.+)/spolecznosc/$', 'spolecznosc', name='spolecznosc'),
     url(r'^(?P<nazwa_profilu>.+)/edycja/$', 'edycja_profilu', name='edycja_profilu'),
     url(r'^(?P<nazwa_profilu>.+)/friends/$', 'friends', name='friends'),
@@ -17,7 +20,8 @@ urlpatterns = patterns('lpp_app.views',
     url(r'^(?P<nazwa_profilu>.+)/osada/dodaj/$', 'nowa_osada', name='nowa_osada'),        
     url(r'^(?P<nazwa_profilu>.+)/osada/(?P<kategoria>.+)/utworz/(?P<slug>[-\w\d]+),(?P<id>\d+)/$', 'utworz_obiekt', name='utworz_obiekt'),
 
-    url(r'^(?P<nazwa_profilu>.+)/invite/(?P<zapr_osoba>.+)/delete/$', 'invite_delete', name='invite_delete'),
+    url(r'^(?P<nazwa_profilu>.+)/accept/(?P<zapr_osoba>.+)/$', 'invite_accept', name='invite_accept'),
+    url(r'^(?P<nazwa_profilu>.+)/invite/(?P<zapr_osoba>.+)/delete/$', 'invite_delete', name='invite_delete'),    
     url(r'^(?P<nazwa_profilu>.+)/invite/(?P<zapr_osoba>.+)/$', 'invite', name='invite'),        
 
     url(r'^(?P<nazwa_osady>.+)/osada/wizytowka/$', 'wizytowka', name='wizytowka'),

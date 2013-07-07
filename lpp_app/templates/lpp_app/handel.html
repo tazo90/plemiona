@@ -16,9 +16,9 @@
     </div> 
 
     <div class="panel left"> 
-        <p class="text-center">Oferta handlowa</p>            
-        <a class="btn btn-success" href="{% url profil request.user %}">Powrót</a>                       
-        <table class="table table-hover" style="margin-left:20px; width:350px">
+        <p class="text-center">Oferty wymiany zasobów</p>
+        <a class="btn btn-success" style="margin-top:-5px; margin-bottom:0;" href="{% url profil request.user %}">Powrót</a>                       
+        <table class="table table-hover" style="">
             <thead>
                 <tr>
                     <th>Nr.</th>
@@ -27,16 +27,20 @@
                     <th>Ilosc</th>
                     <th>Surowiec 2</th>
                     <th>Ilosc</th>
+                    <th>Wymień</th>
             </thead>
             <tbody>
                 {% for prod in oferta %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td class="span3">{{ prod.osada }}</td>                    
+                    <td class="span3"><a href="{% url wizytowka prod.osada %}">{{ prod.osada }}</a></td>                    
                     <td class="span2">{{ prod.surowiec1 }}</td>
-                    <td class="span1">{{ prod.ilosc1 }}</td>
+                    <td>{{ prod.ilosc1 }}</td>
                     <td class="span2">{{ prod.surowiec2 }}</td>
-                    <td class="span1">{{ prod.ilosc2 }}</td>
+                    <td>{{ prod.ilosc2 }}</td>
+                    {% if prod.osada.user != request.user.profile %}
+                        <td><a href="{% url wymiana prod.osada.user prod.surowiec1 prod.ilosc1 prod.surowiec2 prod.ilosc2 %}" class="btn btn-small btn-info">Wymień</a></td>
+                    {% endif %}
                 </tr>                
                 {% endfor %}
             </tbody>
@@ -52,7 +56,7 @@
             </table>
             {% endfor %}
             <br />
-            <input type="submit" value="Dodaj">
+            <input style="margin-left:150px; width:164px;" type="submit" value="Dodaj">
         </form>
     </div>
 </div>

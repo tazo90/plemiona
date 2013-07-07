@@ -1,3 +1,4 @@
+#coding: utf-8
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -117,19 +118,28 @@ from django.views.decorators.csrf import csrf_exempt
 @login_required
 @csrf_exempt
 def osada(request, nazwa_profilu=None):            
-    osada = Osada.objects.filter(user=request.user.profile)[0]
+    osada = Osada.objects.filter(user=request.user.profile)
 
-    armia = Armia_osada.objects.select_related().filter(osada=osada, ilosc__gt=0).order_by('-armia__nazwa')
-    budynki = Budynki_osada.objects.select_related().filter(osada=osada, ilosc__gt=0).order_by('-budynek__nazwa')
+    armia = Armia_osada.objects.select_related().filter(osada=osada[0], ilosc__gt=0).order_by('-armia__nazwa')
+    budynki = Budynki_osada.objects.select_related().filter(osada=osada[0], ilosc__gt=0).order_by('-budynek__nazwa')
 
-    if request.POST.has_key('counter'):            
+    if request.POST.has_key('counter'):                  
+      if request.POST['obiekt_nazwa'] == u'Kopalnia złota':
+        osada.update(zloto=F('zloto') + 30)
+      elif request.POST['obiekt_nazwa'] == u'Kopalnia żelaza':
+        osada.update(zelazo=F('zelazo') + 30)
+      elif request.POST['obiekt_nazwa'] == u'Tartak':
+        osada.update(drewno=F('drewno') + 30)
+      elif request.POST['obiekt_nazwa'] == u'Kamieniołom':
+        osada.update(kamien=F('kamien') + 30)
+
       budynki.filter(budynek__nazwa=request.POST['obiekt_nazwa']).update(
-        produkcja=int(request.POST['counter'].split(' ')[0]) 
+        produkcja=int(request.POST['counter'].split(' ')[0],) 
         )      
 
     return render(request,
                   "lpp_app/osada.html",
-                  {'osada': osada,
+                  {'osada': osada[0],
                    'armia': armia,
                    'budynki': budynki,
                   })   
@@ -237,10 +247,22 @@ def invite_delete(request, nazwa_profilu=None, zapr_osoba=None):
   u1 = UserProfile.objects.get(user=request.user)  
   u2 = UserProfile.objects.get(user__username=zapr_osoba)
 
-  Invites.objects.get(user_from=u1, user_to=u2).delete()
+  Invites.objects.filter(user_from=u1, user_to=u2).delete()
+  #gdu nie powoedzenie, to pewnie jest druga relacja
+  Invites.objects.filter(user_from=u2, user_to=u1).delete()
 
   return redirect(reverse("zaproszenia", args=(nazwa_profilu,)))
 
+
+@login_required
+def invite_accept(request, nazwa_profilu=None, zapr_osoba=None):
+  kto_zaprasza = UserProfile.objects.get(user__username=zapr_osoba)
+  Friends.objects.create(user1=request.user.profile, user2=kto_zaprasza)
+
+  Invites.objects.filter(user_from=request.user.profile, user_to=kto_zaprasza).delete()
+  Invites.objects.filter(user_from=kto_zaprasza, user_to=request.user.profile).delete()
+  return redirect(reverse('friends', args=(nazwa_profilu, )))
+  
 
 @login_required
 def friends(request, nazwa_profilu=None):
@@ -267,19 +289,103 @@ def handel(request, nazwa_profilu=None):
     if request.method == "POST":         
         handel_form = HandelForm(data=request.POST)
         if handel_form.is_valid():
-            handel = handel_form.save(commit=False)
-            handel.osada = Osada.objects.get(user=request.user)
-            handel.save()            
-            return redirect(reverse('profil', args=(nazwa_profilu,)))
+            _handel = handel_form.save(commit=False)
+            _handel.osada = Osada.objects.get(user=request.user)
+            _handel.save()            
+            return redirect(reverse('handel', args=(nazwa_profilu,)))
         else:
-            return handel(request, handel_form=handel_form)
+            #return handel(request, handel_form=handel_form)
+            #powinien wywolac handel zeby sprawdzic bledu w form
+            return redirect(reverse('handel', args=(nazwa_profilu,)))
     
     handel_form = HandelForm()  
-    oferta = Handel.objects.filter(osada=Osada.objects.get(user=request.user))  
+    oferta = Handel.objects.all()
     return render(request,
                   "lpp_app/handel.html",
                   {'handel_form': handel_form, 
                    'oferta': oferta,})
+
+
+def wymiana(request, nazwa_profilu=None, sur1=None, ile1=None, sur2=None, ile2=None):
+  #print sur1, ' ', ile1, ' ', sur2, ' ', ile2
+  osada_sprzed = Osada.objects.filter(user__user__username=nazwa_profilu)
+  osada_kupuj = Osada.objects.filter(user=request.user)   # TO MY!
+
+  if sur2 == 'zloto':
+    if osada_kupuj[0].zloto > int(ile2):    
+      if sur1 == 'zloto':        
+        osada_kupuj.update(zloto=F('zloto') + ile1 - ile2)
+        osada_sprzed.update(zloto=F('zloto') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'drewno':
+        osada_kupuj.update(zloto=F('zloto') - ile2, drewno=F('drewno') + ile1)
+        osada_sprzed.update(zloto=F('zloto') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'kamien':
+        osada_kupuj.update(zloto=F('zloto') - ile2, kamien=F('kamien') + ile1)
+        osada_sprzed.update(zloto=F('zloto') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'zelazo':
+        osada_kupuj.update(zloto=F('zloto') - ile2, zelazo=F('zelazo') + ile1)
+        osada_sprzed.update(zloto=F('zloto') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+  elif sur2 == 'drewno':
+    if osada_kupuj[0].drewno > int(ile2):    
+      if sur1 == 'zloto':        
+        osada_kupuj.update(drewno=F('drewno') - ile2, zloto=F('zloto') + ile1)
+        osada_sprzed.update(drewno=F('drewno') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'drewno':
+        osada_kupuj.update(drewno=F('drewno') + ile1 - ile2)
+        osada_sprzed.update(drewno=F('drewno') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'kamien':
+        osada_kupuj.update(drewno=F('drewno') - ile2, kamien=F('kamien') + ile1)
+        osada_sprzed.update(drewno=F('drewno') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'zelazo':
+        osada_kupuj.update(drewno=F('drewno') - ile2, zelazo=F('zelazo') + ile1)
+        osada_sprzed.update(drewno=F('drewno') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+  elif sur2 == 'kamien':
+    if osada_kupuj[0].kamien > int(ile2):    
+      if sur1 == 'zloto':        
+        osada_kupuj.update(kamien=F('kamien') - ile2, zloto=F('zloto') + ile1)
+        osada_sprzed.update(kamien=F('kamien') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'kamien':
+        osada_kupuj.update(kamien=F('kamien') + ile1 - ile2)
+        osada_sprzed.update(kamien=F('kamien') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'drewno':
+        osada_kupuj.update(kamien=F('kamien') - ile2, drewno=F('drewno') + ile1)
+        osada_sprzed.update(kamien=F('kamien') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'zelazo':
+        osada_kupuj.update(kamien=F('kamien') - ile2, zelazo=F('zelazo') + ile1)
+        osada_sprzed.update(kamien=F('kamien') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+  elif sur2 == 'zelazo':
+    if osada_kupuj[0].zelazo > int(ile2):    
+      if sur1 == 'zloto':        
+        osada_kupuj.update(zelazo=F('zelazo') - ile2, zloto=F('zloto') + ile1)
+        osada_sprzed.update(zelazo=F('zelazo') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'zelazo':
+        osada_kupuj.update(zelazo=F('zelazo') + ile1 - ile2)
+        osada_sprzed.update(zelazo=F('zelazo') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'drewno':
+        osada_kupuj.update(zelazo=F('zelazo') - ile2, drewno=F('drewno') + ile1)
+        osada_sprzed.update(zelazo=F('zelazo') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+      elif sur1 == 'kamien':
+        osada_kupuj.update(zelazo=F('zelazo') - ile2, kamien=F('kamien') + ile1)
+        osada_sprzed.update(zelazo=F('zelazo') + ile2)
+        Handel.objects.filter(osada=osada_sprzed[0], surowiec1=sur1, ilosc1=ile1, surowiec2=sur2, ilosc2=ile2).delete()
+
+  return redirect(reverse('handel', args=(nazwa_profilu, )))
+
 
 
 @login_required
@@ -298,16 +404,18 @@ def wizytowka(request, nazwa_osady=None):
   osada = Osada.objects.select_related().get(nazwa=nazwa_osady)    
   invited = False
 
-  # sprawdza czy zalogowany user zaprosil dana osade, 
-  # zmienna invited okresla czy button "Zapros" bedzie widoczny
-  # :user_from jest profilem dlatego request.user.profile
-  # :user_to bierze osada.user ktora jest profilem
+  """
+    sprawdza czy zalogowany user zaprosil dana osade, 
+    zmienna invited okresla czy button "Zapros" bedzie widoczny
+    :user_from jest profilem dlatego request.user.profile
+    :user_to bierze osada.user ktora jest profilem
+  """
   if request.user.profile == osada.user:  # swoj profil, nie wyswietlaj zapros
     invited = True
   elif Invites.objects.filter(user_from=request.user.profile, user_to=osada.user):
-    invited = True  
-  elif Friends.objects.extra(select={'invited': 'select count(*) from lpp_app_friends where (user1_id=1 and user2_id=2) or (user1_id=2 and user2_id=1)'},):
-      invited = True  
+    invited = True    
+  elif Friends.objects.filter(user1=request.user.profile, user2=osada.user) or Friends.objects.filter(user1=osada.user, user2=request.user.profile):
+    invited = True
   
   return render(request,
                 "lpp_app/wizytowka.html",
