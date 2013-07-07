@@ -2,14 +2,9 @@
 <html>
 <head>
     <title>Tazo Gaming</title>    
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap.css" type="text/css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}reset.css" type="text/css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}style.less" type="text/less" />
-
-    <script src="{{ STATIC_URL }}js/jquery-2.0.2.min.js"></script>
-    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}js/default.js"></script>
-    <script src="{{ STATIC_URL }}less.js"></script>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/reset.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/style.less" type="text/less" />
 </head>
 
 <body>
@@ -175,6 +170,11 @@
         </footer>  
         {% endblock %}              
     </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>    
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>    
+    <script src="{{ STATIC_URL }}js/default.js"></script>
+    <script src="//raw.github.com/less/less.js/master/dist/less-1.4.1.min.js"></script>        
 
 </body>
 </html>
